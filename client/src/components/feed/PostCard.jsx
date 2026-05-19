@@ -2,7 +2,7 @@ import { Heart, MessageCircle, Send } from "lucide-react";
 
 import 'react'
 
-const PostCard = () => {
+const PostCard = ({ post }) => {
     return (
         <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-[0_4px_30px_rgba(0,0,0,0.04)]">
 
@@ -12,7 +12,7 @@ const PostCard = () => {
                 <div className="flex items-center gap-3">
 
                     <img
-                        src="https://i.pravatar.cc/150?img=3"
+                        src={post.profile_pic || "https://i.pravatar.cc/150?img=3"}
                         alt=""
                         className="w-12 h-12 rounded-full object-cover ring-2 ring-gray-100"
                     />
@@ -20,11 +20,11 @@ const PostCard = () => {
                     <div>
 
                         <h3 className="font-semibold text-gray-900 text-[15px]">
-                            Vimal Malam
+                            {post.username}
                         </h3>
 
                         <p className="text-sm text-gray-500">
-                            2 hours ago
+                            {new Date(post.created_at).toLocaleString()}
                         </p>
 
                     </div>
@@ -37,9 +37,9 @@ const PostCard = () => {
             <div className="overflow-hidden">
 
                 <img
-                    src="https://images.unsplash.com/photo-1506744038136-46273834b3fb"
+                    src={post.image}
                     alt=""
-                    className="w-full h-[500px] object-cover hover:scale-[1.01] transition duration-500"
+                    className="w-full h-125 object-cover hover:scale-[1.01] transition duration-500"
                 />
 
             </div>
@@ -70,10 +70,10 @@ const PostCard = () => {
                 <p className="text-gray-700 leading-relaxed text-[15px]">
 
                     <span className="font-semibold text-black mr-2">
-                        VimalMalam
+                        {post.username}
                     </span>
 
-                    Beautiful nature view 🌿
+                    {post.caption}
 
                 </p>
 

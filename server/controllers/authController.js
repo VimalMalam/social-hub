@@ -94,19 +94,11 @@ export const login = (req, res) => {
                 });
             }
 
-            // GENERATE TOKEN
-            const token = generateToken(user);
+            
 
-            // REMOVE PASSWORD
-            delete user.password;
+            
 
-            // STORE TOKEN IN HTTP-ONLY COOKIE
-            res.cookie("token", token, {
-                httpOnly: true,
-                secure: false,
-                sameSite: "lax",
-                maxAge: 7 * 24 * 60 * 60 * 1000
-            });
+            
 
             // SEND OTP
             const otp = Math.floor(
@@ -140,8 +132,38 @@ export const login = (req, res) => {
             res.status(200).json({
                 message: "OTP sent to email",
                 user,
-                token
             });
+        });
+    } catch (error) {
+        res.status(500).json(error);
+    }
+};
+
+// FINAL LOGIN AFTER OTP VERIFICATION
+export const completeLogin = (req, res) => {
+    try {
+        const {user} = req.body;
+
+        if (!user) {
+            return res.status(400).json({
+                message: "User data is missing"
+            });
+        }
+
+        // GENERATE TOKEN
+        const token = generateToken(user);
+
+        // STORE TOKEN IN HTTP-ONLY COOKIE
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "lax",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+        res.status(200).json({
+            message: "Login successful",
+            user
         });
     } catch (error) {
         res.status(500).json(error);

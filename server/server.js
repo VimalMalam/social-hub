@@ -7,6 +7,7 @@ import { verifyToken } from "./middleware/authMiddleware.js";
 import "./config/db.js";
 
 import authRoutes from "./routes/authRoutes.js";
+import postRoutes from "./routes/postRoutes.js";
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use(cookieParser());
 
 // ROUTES
 app.use("/api/auth", authRoutes);
+app.use("/api/posts", postRoutes);
 
 
 app.get("/", (req, res) => {
