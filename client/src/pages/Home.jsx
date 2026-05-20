@@ -37,6 +37,7 @@ const Home = () => {
                         <PostCard
                             key={post.id}
                             post={post}
+                            fetchPosts={fetchPosts}
                         />
 
                     ))

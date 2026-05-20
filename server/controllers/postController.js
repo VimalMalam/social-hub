@@ -32,10 +32,13 @@ export const createPost = async (req, res) => {
 // GET ALL POSTS
 export const getPosts = (req, res) => {
     try {
+        const userId = req.user.id;
+
         db.query(
-            "CALL GetPosts()", (err, result) => {
+            "CALL GetPosts(?)", [userId], (err, result) => {
                 if (err) {
                     console.log(err);
+                    
                     return res.status(500).json({ message: err.message });
                 }
 
@@ -43,6 +46,102 @@ export const getPosts = (req, res) => {
             }
         );
     } catch (error) {
-        res.ststus(500).json(error);
+        res.status(500).json(error);
     }
 };
+
+// LIKE POST
+export const likePost = (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const { postId } = req.body;
+
+        db.query("CALL LikePost(?, ?)", [userId, postId], (err, result) => {
+            if (err) {
+                console.log(err);
+
+                return res.status(500).json({
+                    message: err.message
+                });
+            }
+
+            res.status(200).json({
+                message: "Post Liked"
+            });
+        });
+    } catch (error) {
+        res.status(500).json(error);
+    }
+};
+
+// UNLIKE POST
+export const unlikePost = (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const { postId } = req.body;
+
+        db.query("CALL UnlikePost(?, ?)", [userId, postId], (err, result) => {
+            if (err) {
+                console.log(err);
+
+                return res.status(500).json({
+                    message: err.message
+                });
+            }
+
+            res.status(200).json({
+                message: "Post Unliked"
+            });
+        });
+    } catch (error) {
+        res.status(500).json(error);
+    }
+};
+
+// ADD COMMENT
+export const addComment = (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const { postId, comment } = req.body;
+
+        db.query("CALL AddComment(?, ?, ?)", [userId, postId, comment], (err, result) => {
+            if (err) {
+                console.log(err);
+
+                return res.status(500).json({
+                    message: err.message
+                });
+            }
+
+            res.status(200).json({
+                message: "Comment Added"
+            });
+        });
+    } catch (error) {
+        res.status(500).json(error);
+    }
+};
+
+// GET COMMENTS
+export const getComments = (req, res) => {
+    try {
+        const { postId } = req.params;
+
+        db.query("CALL GetComments(?)", [postId], (err, result) => {
+            if (err) {
+                console.log(err);
+
+                return res.status(500).json({
+                    message: err.message
+                });
+            }
+
+            res.status(200).json(result[0]);
+        });
+    } catch (error) {
+        res.status(500).json(error);
+    }
+}

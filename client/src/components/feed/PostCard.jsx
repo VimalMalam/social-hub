@@ -1,8 +1,30 @@
 import { Heart, MessageCircle, Send } from "lucide-react";
-
+import { useState } from "react";
 import 'react'
+import API from "../../api/axios.js";
+import CommentModal from "./CommentModal.jsx";
 
-const PostCard = ({ post }) => {
+const PostCard = ({ post, fetchPosts }) => {
+
+    const [showComments, setShowComments] = useState(false);
+    const [liked, setLiked] = useState(post.isLiked);
+
+    const handleLike = async () => {
+        try {
+            if (liked) {
+                await API.post("/posts/unlike", { postId: post.id });
+                setLiked(false);
+            } else {
+                await API.post("/posts/like", { postId: post.id });
+                setLiked(true);
+            }
+
+            fetchPosts();
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return (
         <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-[0_4px_30px_rgba(0,0,0,0.04)]">
 
@@ -50,21 +72,21 @@ const PostCard = ({ post }) => {
                 <div className="flex items-center gap-5 mb-4">
 
                     <button className="text-gray-700 hover:text-red-500 transition-all duration-300">
-                        <Heart size={22} />
+                        <Heart onClick={handleLike} className={`cursor-pointer ${liked ? "fill-red-500 text-red-500" : ""}`} size={22} />
                     </button>
 
                     <button className="text-gray-700 hover:text-blue-500 transition-all duration-300">
-                        <MessageCircle size={22} />
+                        <MessageCircle onClick={() => setShowComments(true)} className="cursor-pointer" size={22} />
                     </button>
 
                     <button className="text-gray-700 hover:text-green-500 transition-all duration-300">
-                        <Send size={22} />
+                        <Send className="cursor-pointer" size={22} />
                     </button>
 
                 </div>
 
                 <p className="font-semibold text-gray-900 text-sm mb-2">
-                    245 likes
+                    {post.likesCount} likes
                 </p>
 
                 <p className="text-gray-700 leading-relaxed text-[15px]">
@@ -77,7 +99,17 @@ const PostCard = ({ post }) => {
 
                 </p>
 
+                <button onClick={() => setShowComments(true)} className="text-gray-500 text-sm">
+                    View all {post.commentsCount} comments
+                </button>
+
             </div>
+
+            {
+                showComments && (
+                    <CommentModal postId={post.id} fetchPosts={fetchPosts} onClose={() => setShowComments(false)} />
+                )
+            }
 
         </div>
     )
