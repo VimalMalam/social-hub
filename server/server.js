@@ -8,6 +8,7 @@ import "./config/db.js";
 
 import authRoutes from "./routes/authRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use(cookieParser());
 // ROUTES
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/users", userRoutes);
 
 
 app.get("/", (req, res) => {

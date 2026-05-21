@@ -6,6 +6,7 @@ import {
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
+import Profile from "./pages/Profile";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
@@ -60,6 +61,11 @@ function App() {
       <Route
         path="/complete-login"
         element={<CompleteLogin />}
+      />
+
+      <Route
+        path="/profile/:id"
+        element={<Profile />}
       />
 
     </Routes>

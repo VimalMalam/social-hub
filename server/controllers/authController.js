@@ -94,11 +94,11 @@ export const login = (req, res) => {
                 });
             }
 
-            
 
-            
 
-            
+
+
+
 
             // SEND OTP
             const otp = Math.floor(
@@ -123,10 +123,28 @@ export const login = (req, res) => {
 
                 subject: "Login OTP",
 
-                html: `
-        <h1>${otp}</h1>
-        <p>Your login OTP</p>
-    `
+                html: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; padding: 40px 20px; text-align: center;">
+  <div style="max-width: 500px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; padding: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+    
+    <h2 style="color: #1a1a1a; margin-top: 0; font-size: 24px;">Secure Login</h2>
+    
+    <p style="color: #555555; font-size: 16px; line-height: 1.5; margin-bottom: 24px;">
+      Here is your One-Time Password (OTP) to securely log in to your account.
+    </p>
+    
+    <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 20px; margin-bottom: 24px;">
+      <h1 style="margin: 0; font-size: 36px; letter-spacing: 6px; color: #0056b3;">
+        ${otp}
+      </h1>
+    </div>
+    
+    <p style="color: #777777; font-size: 14px; line-height: 1.5; margin-bottom: 0;">
+      This code will expire in <strong>10 minutes</strong>.<br>
+      If you didn't request this email, you can safely ignore it.
+    </p>
+    
+  </div>
+</div>`
             });
 
             res.status(200).json({
@@ -142,7 +160,7 @@ export const login = (req, res) => {
 // FINAL LOGIN AFTER OTP VERIFICATION
 export const completeLogin = (req, res) => {
     try {
-        const {user} = req.body;
+        const { user } = req.body;
 
         if (!user) {
             return res.status(400).json({
@@ -212,15 +230,33 @@ export const sendOTP = async (req, res) => {
             subject: "Your OTP Code",
 
             html: `
-                <div style="font-family:sans-serif">
-                    <h2>Email Verification</h2>
-
-                    <p>Your OTP is:</p>
-
-                    <h1>${otp}</h1>
-
-                    <p>This OTP expires in 5 minutes.</p>
-                </div>
+                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; padding: 40px 20px; text-align: center;">
+  <div style="max-width: 500px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; padding: 40px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+    
+    <h2 style="color: #111827; margin-top: 0; font-size: 24px; font-weight: 600;">Verify Your Email Address</h2>
+    
+    <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
+      Welcome! We're excited to have you. To complete your registration and secure your account, please enter the verification code below:
+    </p>
+    
+    <div style="background-color: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 24px; margin-bottom: 24px;">
+      <h1 style="margin: 0; font-size: 36px; letter-spacing: 8px; color: #2563eb;">
+        ${otp}
+      </h1>
+    </div>
+    
+    <p style="color: #4b5563; font-size: 14px; line-height: 1.5; margin-bottom: 24px;">
+      This verification code will expire in <strong>5 minutes</strong>.
+    </p>
+    
+    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
+    
+    <p style="color: #6b7280; font-size: 12px; line-height: 1.5; margin-bottom: 0;">
+      If you did not sign up for this account, you can safely ignore this email. Someone else might have typed your email address by mistake.
+    </p>
+    
+  </div>
+</div>
             `
         });
 

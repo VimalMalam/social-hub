@@ -4,6 +4,12 @@ SELECT * FROM users;
 
 SELECT * FROM posts;
 
+SELECT * FROM likes;
+
+SELECT * FROM comments;
+
+DELETE FROM comments WHERE id = 2;
+
 CREATE TABLE likes (
 	id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
@@ -159,7 +165,134 @@ END $$
 
 DELIMITER ;
 
+CREATE TABLE followers (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+    follower_id INT NOT NULL,
+    following_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (follower_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE,
 
+    FOREIGN KEY (following_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE,
+
+    UNIQUE(follower_id, following_id)
+);
+
+ALTER TABLE users
+ADD COLUMN bio TEXT,
+ADD COLUMN profile_pic TEXT;
+
+DELIMITER $$
+
+CREATE PROCEDURE FollowUser(
+	IN p_follower_id INT,
+    IN p_following_id INT
+)
+BEGIN
+	INSERT INTO followers(
+        follower_id,
+        following_id
+    )
+    VALUES(
+        p_follower_id,
+        p_following_id
+    );
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE UnfollowUser(
+    IN p_follower_id INT,
+    IN p_following_id INT
+)
+BEGIN
+    DELETE FROM followers
+    WHERE follower_id = p_follower_id
+    AND following_id = p_following_id;
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE GetUserProfile(
+	IN p_profile_id INT,
+    IN p_logged_in_user INT
+)
+BEGIN
+	SELECT
+		users.id,
+        users.username,
+        users.email,
+        users.bio,
+        users.profile_pic,
+        
+        (
+			SELECT COUNT(*)
+            FROM followers
+            WHERE following_id = users.id
+        ) AS followersCount,
+        (
+			SELECT COUNT(*)
+            FROM followers
+            WHERE follower_id = users.id
+        ) AS followingCount,
+        (
+			SELECT COUNT(*)
+            FROM posts
+            WHERE posts.user_id = users.id
+        ) AS postsCount,
+        
+        EXISTS(
+			SELECT * FROM followers
+            WHERE follower_id = p_logged_in_user
+            AND following_id = users.id
+        ) AS isFollowing
+        
+        FROM users
+        WHERE users.id = p_profile_pic;
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE GetUserPosts(
+	IN p_user_id INT
+)
+BEGIN
+	SELECT * FROM posts
+    WHERE user_id = p_user_id
+    ORDER BY created_at DESC;
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+	
+CREATE PROCEDURE UpdateProfile(
+	IN p_user_id INT,
+    IN p_bio TEXT,
+    IN p_profile_pic TEXT
+)
+BEGIN
+	UPDATE users
+    SET
+		bio = p_bio,
+        profile_pic = IFNULL(
+			p_profile_pic,
+            profile_pic
+        )
+	WHERE id = p_user_id;
+END $$
+    
+DELIMITER ;
         
 
 

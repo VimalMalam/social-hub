@@ -3,6 +3,7 @@ import { useState } from "react";
 import 'react'
 import API from "../../api/axios.js";
 import CommentModal from "./CommentModal.jsx";
+import { Link } from "react-router-dom";
 
 const PostCard = ({ post, fetchPosts }) => {
 
@@ -41,9 +42,12 @@ const PostCard = ({ post, fetchPosts }) => {
 
                     <div>
 
-                        <h3 className="font-semibold text-gray-900 text-[15px]">
+                        <Link
+                            to={`/profile/${post.user_id}`}
+                            className="font-semibold text-gray-900 text-[15px]"
+                        >
                             {post.username}
-                        </h3>
+                        </Link>
 
                         <p className="text-sm text-gray-500">
                             {new Date(post.created_at).toLocaleString()}
