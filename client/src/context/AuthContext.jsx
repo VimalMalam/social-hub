@@ -1,29 +1,37 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import API from "../api/axios";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    //LOAD USER FROM LOCAL STORAGE
     useEffect(() => {
+        const loadUser = async () => {
+            try {
+                // Try to fetch current user from server (protected route)
+                const res = await API.get("/users/me"); // ensure axios has credentials
+                const currentUser = res.data;
+                setUser(currentUser);
+                localStorage.setItem("user", JSON.stringify(currentUser));
+            } catch (err) {
+                // fallback to localStorage if API call fails (e.g., no cookie/token)
+                const stored = localStorage.getItem("user");
+                if (stored) setUser(JSON.parse(stored));
+            } finally {
+                setLoading(false);
+            }
+        };
 
-        const storedUser = localStorage.getItem("user");
-
-        if (storedUser) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setUser(JSON.parse(storedUser));
-        }
-
+        loadUser();
     }, []);
 
     return (
-        <AuthContext.Provider value={{ user, setUser }}>
+        <AuthContext.Provider value={{ user, setUser, loading }}>
             {children}
         </AuthContext.Provider>
-    )
+    );
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);

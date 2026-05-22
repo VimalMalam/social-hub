@@ -393,7 +393,10 @@ BEGIN
 END $$
 
 DELIMITER ;
-        
+
+UPDATE users
+SET role = 'admin'
+WHERE email = 'adminn123@yopmail.com';
 
 
 

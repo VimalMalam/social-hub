@@ -138,7 +138,19 @@ export const getCurrentUser = (req, res) => {
 
         db.query(
 
-            "SELECT * FROM users WHERE id = ?",
+            `
+            SELECT
+                id,
+                username,
+                email,
+                profile_pic,
+                bio,
+                role
+
+            FROM users
+
+            WHERE id = ?
+            `,
 
             [userId],
 
@@ -156,7 +168,7 @@ export const getCurrentUser = (req, res) => {
 
 
                 res.status(200).json(
-                    result[0]
+                    result[0][0]
                 );
 
             }
@@ -165,6 +177,7 @@ export const getCurrentUser = (req, res) => {
 
     }
     catch (error) {
+        console.log(error);
 
         res.status(500).json(error);
 

@@ -11,10 +11,12 @@ import Profile from "./pages/Profile";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
+import AdminRoute from "./components/AdminRoute";
 
 import VerifyOTP from "./pages/VerifyOTP";
 import CompleteRegister from "./pages/CompleteRegister";
 import CompleteLogin from "./pages/CompleteLogin";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
 
@@ -48,6 +50,15 @@ function App() {
           <ProtectedRoute>
             <Home />
           </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin"
+        element={
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
         }
       />
 
