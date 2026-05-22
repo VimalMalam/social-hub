@@ -181,21 +181,7 @@ export const getSuggestedUsers = (req, res) => {
 
 
         db.query(
-
-            `
-            SELECT
-                id,
-                username,
-                profile_pic
-            FROM users
-            WHERE id != ?
-            ORDER BY RAND()
-            LIMIT 3
-            `,
-
-            [loggedInUser],
-
-            (err, result) => {
+            "CALL GetSuggestedUsers(?)", [loggedInUser], (err, result) => {
 
                 if (err) {
 
@@ -208,7 +194,7 @@ export const getSuggestedUsers = (req, res) => {
                 }
 
 
-                res.status(200).json(result);
+                res.status(200).json(result[0]);
 
             }
 
@@ -224,3 +210,30 @@ export const getSuggestedUsers = (req, res) => {
     }
 
 };
+
+// SEARCH USERS
+export const searchUsers = (req, res) => {
+    try {
+        const search = req.query.search;
+
+        db.query(
+            "CALL SearchUsers(?)", [search], (err, result) => {
+                if (err) {
+                    console.log(err)
+
+                    return res.status(500).json({
+                        message: err.message
+                    });
+                }
+
+                res.status(200).json(
+                    result[0]
+                );
+            }
+        );
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json(error);
+    }
+}

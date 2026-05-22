@@ -14,7 +14,7 @@ SHOW TABLES;
 
 DROP PROCEDURE IF EXISTS GetUserProfile;
 
-DELETE FROM users WHERE id = 9;
+DELETE FROM users WHERE id = 6;
 
 CREATE TABLE likes (
 	id INT PRIMARY KEY AUTO_INCREMENT,
@@ -352,6 +352,46 @@ BEGIN
 	WHERE id = p_user_id;
 END $$
     
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE SearchUsers(
+	IN p_search VARCHAR(255)
+)
+BEGIN
+	SELECT 
+		id,
+        username,
+        profile_pic
+	FROM users
+    WHERE username LIKE CONCAT('%', p_search, '%')
+    LIMIT 5;
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE GetSuggestedUsers(
+	IN p_logged_in_user INT
+)
+BEGIN
+	SELECT
+		id,
+        username,
+        profile_pic
+	FROM users
+    WHERE id != p_logged_in_user
+    AND id NOT IN(
+		SELECT following_id
+        FROM followers
+        WHERE follower_id = p_logged_in_user
+    )
+    ORDER BY RAND()
+    LIMIT 3;
+END $$
+
 DELIMITER ;
         
 

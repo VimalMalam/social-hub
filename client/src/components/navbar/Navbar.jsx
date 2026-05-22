@@ -1,11 +1,36 @@
 import { Link } from "react-router-dom";
 import { Search, Bell, MessageCircle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import 'react'
+import { useEffect, useState } from 'react';
+import API from "../../api/axios.js";
 
 const Navbar = () => {
 
-    const { user, setUser } = useAuth();
+    const [search, setSearch] = useState("");
+    const [users, setUsers] = useState([]);
+
+    const { user } = useAuth();
+
+    const searchUsers = async () => {
+        try {
+            if (!search.trim()) {
+                setUsers([]);
+                return;
+            }
+            const res = await API.get(`/users/search?search=${search}`);
+            setUsers(res.data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(() => {
+        const delay = setTimeout(() => {
+            searchUsers();
+        }, 500);
+
+        return () => clearTimeout(delay);
+    }, [search]);
 
     return (
         <div className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200">
@@ -24,7 +49,7 @@ const Navbar = () => {
 
 
                     {/* SEARCH */}
-                    <div className="hidden md:flex items-center w-87.5 bg-gray-100/80 border border-gray-200 rounded-2xl px-4 py-3">
+                    <div className="hidden relative md:flex items-center w-87.5 bg-gray-100/80 border border-gray-200 rounded-2xl px-4 py-3">
 
                         <Search
                             size={18}
@@ -34,8 +59,43 @@ const Navbar = () => {
                         <input
                             type="text"
                             placeholder="Search"
+                            value={search}
+                            onChange={(e) => {setSearch(e.target.value)}}
                             className="bg-transparent outline-none ml-3 w-full text-sm text-gray-700 placeholder:text-gray-500"
                         />
+
+                        {
+                            users.length > 0 && (
+                                <div className="absolute top-14 left-0 bg-white shadow-xl rounded-xl w-full p-3 z-50">
+                                    {
+                                        users.map((user) => (
+                                            <Link
+                                                to={`/profile/${user.id}`}
+                                                key={user.id}
+                                                onClick={() => {
+                                                    setSearch("");
+                                                    setUsers([]);
+                                                }}
+                                            >
+                                                <div className="flex items-center gap-3 p-2 hover:bg-gray-100 rounded-xl">
+                                                    <img
+                                                        src={
+                                                            user.profile_pic ||
+                                                            "https://i.pravatar.cc/150"
+                                                        }
+                                                        alt=""
+                                                        className="w-10 h-10 rounded-full object-cover"
+                                                    />
+                                                    <h3 className="font-medium">
+                                                        {user.username}
+                                                    </h3>
+                                                </div>
+                                            </Link>
+                                        ))
+                                    }
+                                </div>
+                            )
+                        }
 
                     </div>
 
