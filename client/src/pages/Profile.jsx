@@ -2,11 +2,18 @@ import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import MainLayout from "../components/layout/MainLayout";
 import API from "../api/axios.js";
+import EditProfileModal from "../components/profile/EditProfileModal.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
+    const { user } = useAuth();
+    const navigate = useNavigate();
+
     const { id } = useParams();
     const [profile, setProfile] = useState(null);
     const [posts, setPosts] = useState([]);
+    const [showEdit, setShowEdit] = useState(false);
 
     const fetchProfile = async () => {
         try {
@@ -15,6 +22,14 @@ const Profile = () => {
             setProfile(res.data);
         } catch (error) {
             console.log(error);
+
+            if (
+                error.response?.status === 404
+            ) {
+
+                navigate("/");
+
+            }
         }
     };
 
@@ -53,96 +68,129 @@ const Profile = () => {
     return (
         <MainLayout>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="bg-white border border-gray-200 rounded-4xl p-6 md:p-8 shadow-[0_4px_30px_rgba(0,0,0,0.04)]">
 
                 {/* TOP */}
-                <div className="flex flex-col md:flex-row gap-10">
+                <div className="flex flex-col md:flex-row md:items-center gap-8 md:gap-12">
 
-                    <img
-                        src={
-                            profile.profile_pic ||
-                            "https://i.pravatar.cc/150"
-                        }
-                        alt=""
-                        className="w-36 h-36 rounded-full object-cover"
-                    />
+                    {/* PROFILE IMAGE */}
+                    <div className="flex justify-center md:justify-start">
+
+                        <img
+                            src={
+                                profile.profile_pic ||
+                                "https://i.pravatar.cc/150"
+                            }
+                            alt=""
+                            className="w-36 h-36 rounded-full object-cover ring-4 ring-gray-100 shadow-sm"
+                        />
+
+                    </div>
 
 
+                    {/* PROFILE INFO */}
                     <div className="flex-1">
 
-                        <div className="flex items-center gap-5 mb-5">
-
-                            <h2 className="text-3xl font-bold">
-
-                                {profile.username}
-
-                            </h2>
-
-
-                            <button
-                                onClick={handleFollow}
-                                className="bg-black text-white px-5 py-2 rounded-xl"
-                            >
-
-                                {
-                                    profile.isFollowing
-                                        ? "Unfollow"
-                                        : "Follow"
-                                }
-
-                            </button>
-
-                        </div>
-
-
-                        <div className="flex gap-8 mb-5">
+                        {/* USERNAME + BUTTON */}
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5 mb-7">
 
                             <div>
 
-                                <span className="font-bold">
+                                <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
+
+                                    {profile.username}
+
+                                </h2>
+
+                            </div>
+
+                            {
+                                Number(user.id) === Number(profile.id) ? (
+
+                                    <button
+                                        onClick={() => setShowEdit(true)}
+                                        className="bg-black text-white px-5 py-2 rounded-xl"
+                                    >
+                                        Edit Profile
+                                    </button>
+
+                                ) : (
+
+                                    <button
+                                        onClick={handleFollow}
+                                        className="bg-gray-900 hover:bg-black text-white px-6 py-3 rounded-2xl font-medium transition-all duration-300 w-full md:w-auto"
+                                    >
+                                        {
+                                            profile.isFollowing
+                                                ? "Unfollow"
+                                                : "Follow"
+                                        }
+                                    </button>
+                                )
+                            }
+
+                        </div>
+
+                        {/* STATS */}
+                        <div className="flex items-center gap-10 mb-7">
+
+                            <div>
+
+                                <h3 className="text-2xl font-bold text-gray-900">
 
                                     {profile.postsCount}
 
-                                </span>
+                                </h3>
 
-                                <p>Posts</p>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    Posts
+                                </p>
 
                             </div>
 
 
                             <div>
 
-                                <span className="font-bold">
+                                <h3 className="text-2xl font-bold text-gray-900">
 
                                     {profile.followersCount}
 
-                                </span>
+                                </h3>
 
-                                <p>Followers</p>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    Followers
+                                </p>
 
                             </div>
 
 
                             <div>
 
-                                <span className="font-bold">
+                                <h3 className="text-2xl font-bold text-gray-900">
 
                                     {profile.followingCount}
 
-                                </span>
+                                </h3>
 
-                                <p>Following</p>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    Following
+                                </p>
 
                             </div>
 
                         </div>
 
 
-                        <p className="text-gray-700">
+                        {/* BIO */}
+                        <div className="max-w-2xl">
 
-                            {profile.bio || "No bio"}
+                            <p className="text-gray-700 leading-relaxed text-[15px]">
 
-                        </p>
+                                {profile.bio || "No bio"}
+
+                            </p>
+
+                        </div>
 
                     </div>
 
@@ -150,24 +198,46 @@ const Profile = () => {
 
 
                 {/* POSTS GRID */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-10">
+                <div className="mt-12">
 
-                    {
-                        posts.map((post) => (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 
-                            <img
-                                key={post.id}
-                                src={post.image}
-                                alt=""
-                                className="w-full h-[300px] object-cover rounded-xl"
-                            />
+                        {
+                            posts.map((post) => (
 
-                        ))
-                    }
+                                <div
+                                    key={post.id}
+                                    className="overflow-hidden rounded-3xl border border-gray-100 bg-gray-50"
+                                >
+
+                                    <img
+                                        src={post.image}
+                                        alt=""
+                                        className="w-full h-72 md:h-80 object-cover hover:scale-[1.03] transition-all duration-500"
+                                    />
+
+                                </div>
+
+                            ))
+                        }
+
+                    </div>
 
                 </div>
 
             </div>
+
+            {
+                showEdit && (
+
+                    <EditProfileModal
+                        profile={profile}
+                        onClose={() => setShowEdit(false)}
+                        refreshProfile={fetchProfile}
+                    />
+
+                )
+            }
 
         </MainLayout>
     )

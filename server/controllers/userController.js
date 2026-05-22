@@ -107,7 +107,7 @@ export const unfollowUser = (req, res) => {
 export const updateProfile = (req, res) => {
     try {
         const userId = req.user.id;
-        const {bio} = req.body;
+        const { bio } = req.body;
         const profilePic = req.file?.path || null;
 
         db.query("CALL UpdateProfile(?, ?, ?)", [userId, bio, profilePic], (err, result) => {
@@ -126,4 +126,101 @@ export const updateProfile = (req, res) => {
     } catch (error) {
         res.status(500).json(error);
     }
+};
+
+// GET CURRENT USER
+export const getCurrentUser = (req, res) => {
+
+    try {
+
+        const userId = req.user.id;
+
+
+        db.query(
+
+            "SELECT * FROM users WHERE id = ?",
+
+            [userId],
+
+            (err, result) => {
+
+                if (err) {
+
+                    console.log(err);
+
+                    return res.status(500).json({
+                        message: err.message
+                    });
+
+                }
+
+
+                res.status(200).json(
+                    result[0]
+                );
+
+            }
+
+        );
+
+    }
+    catch (error) {
+
+        res.status(500).json(error);
+
+    }
+
+};
+
+// GET RANDOM USERS
+export const getSuggestedUsers = (req, res) => {
+
+    try {
+
+        const loggedInUser = req.user.id;
+
+
+        db.query(
+
+            `
+            SELECT
+                id,
+                username,
+                profile_pic
+            FROM users
+            WHERE id != ?
+            ORDER BY RAND()
+            LIMIT 3
+            `,
+
+            [loggedInUser],
+
+            (err, result) => {
+
+                if (err) {
+
+                    console.log(err);
+
+                    return res.status(500).json({
+                        message: err.message
+                    });
+
+                }
+
+
+                res.status(200).json(result);
+
+            }
+
+        );
+
+    }
+    catch (error) {
+
+        console.log(error);
+
+        res.status(500).json(error);
+
+    }
+
 };

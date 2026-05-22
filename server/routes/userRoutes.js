@@ -1,5 +1,5 @@
 import express from "express";
-import { getProfile, getUserPosts, followUser, unfollowUser, updateProfile } from "../controllers/userController.js";
+import { getProfile, getUserPosts, followUser, unfollowUser, updateProfile, getCurrentUser, getSuggestedUsers } from "../controllers/userController.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
 import upload from "../middleware/uploadMiddleware.js";
 
@@ -19,5 +19,11 @@ router.post("/unfollow", verifyToken, unfollowUser);
 
 // UPDATE PROFILE
 router.put("/update", verifyToken, upload.single("profile_pic"), updateProfile);
+
+// GET CURRENT USER
+router.get("/me", verifyToken, getCurrentUser);
+
+// GET RANDOM USERS
+router.get("/suggested", verifyToken, getSuggestedUsers);
 
 export default router;

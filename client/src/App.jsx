@@ -2,6 +2,7 @@ import {
   Routes,
   Route
 } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -16,6 +17,26 @@ import CompleteRegister from "./pages/CompleteRegister";
 import CompleteLogin from "./pages/CompleteLogin";
 
 function App() {
+
+  const { loading } = useAuth();
+
+  if (loading) {
+
+    return (
+
+      <div className="h-screen flex items-center justify-center">
+
+        <h1 className="text-2xl font-bold">
+
+          Loading...
+
+        </h1>
+
+      </div>
+
+    )
+
+  }
 
   return (
 

@@ -8,7 +8,13 @@ SELECT * FROM likes;
 
 SELECT * FROM comments;
 
-DELETE FROM comments WHERE id = 2;
+DESCRIBE users;
+
+SHOW TABLES;
+
+DROP PROCEDURE IF EXISTS GetUserProfile;
+
+DELETE FROM users WHERE id = 9;
 
 CREATE TABLE likes (
 	id INT PRIMARY KEY AUTO_INCREMENT,
@@ -257,6 +263,60 @@ BEGIN
         
         FROM users
         WHERE users.id = p_profile_pic;
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE GetUserProfile(
+
+    IN p_profile_id INT,
+    IN p_logged_in_user INT
+
+)
+BEGIN
+
+    SELECT
+
+        users.id,
+        users.username,
+        users.email,
+        users.bio,
+        users.profile_pic,
+
+        (
+            SELECT COUNT(*)
+            FROM followers
+            WHERE following_id = users.id
+        ) AS followersCount,
+
+        (
+            SELECT COUNT(*)
+            FROM followers
+            WHERE follower_id = users.id
+        ) AS followingCount,
+
+        (
+            SELECT COUNT(*)
+            FROM posts
+            WHERE posts.user_id = users.id
+        ) AS postsCount,
+
+        EXISTS(
+
+            SELECT 1
+            FROM followers
+
+            WHERE follower_id = p_logged_in_user
+            AND following_id = users.id
+
+        ) AS isFollowing
+
+    FROM users
+
+    WHERE users.id = p_profile_id;
+
 END $$
 
 DELIMITER ;

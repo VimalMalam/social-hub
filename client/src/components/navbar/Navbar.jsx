@@ -5,7 +5,7 @@ import 'react'
 
 const Navbar = () => {
 
-    const { user } = useAuth();
+    const { user, setUser } = useAuth();
 
     return (
         <div className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200">
@@ -24,7 +24,7 @@ const Navbar = () => {
 
 
                     {/* SEARCH */}
-                    <div className="hidden md:flex items-center w-[350px] bg-gray-100/80 border border-gray-200 rounded-2xl px-4 py-3">
+                    <div className="hidden md:flex items-center w-87.5 bg-gray-100/80 border border-gray-200 rounded-2xl px-4 py-3">
 
                         <Search
                             size={18}
@@ -63,7 +63,7 @@ const Navbar = () => {
                             <img
                                 src={
                                     user?.profile_pic ||
-                                    "https://i.pravatar.cc/150?img=3"
+                                    "https://i.pravatar.cc/150"
                                 }
                                 alt=""
                                 className="w-11 h-11 rounded-2xl object-cover ring-2 ring-gray-100"
@@ -76,6 +76,15 @@ const Navbar = () => {
                         </div>
 
                     </div>
+
+                    {/* <button
+                        onClick={handleLogout}
+                        className="bg-red-500 text-white px-4 py-2 rounded-xl cursor-pointer"
+                    >
+
+                        Logout
+
+                    </button> */}
 
                 </div>
 

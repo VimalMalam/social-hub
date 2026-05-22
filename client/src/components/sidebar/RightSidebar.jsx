@@ -1,71 +1,85 @@
-import 'react'
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import API from "../../api/axios.js";
 
 const RightSidebar = () => {
 
-    const suggestions = [
-        {
-            id: 1,
-            name: "John Doe"
-        },
-        {
-            id: 2,
-            name: "Sarah Smith"
-        },
-        {
-            id: 3,
-            name: "Alex Johnson"
+    const [users, setUsers] = useState([]);
+
+    const fetchUsers = async () => {
+
+        try {
+
+            const res = await API.get(
+                "/users/suggested"
+            );
+
+            setUsers(res.data);
+
         }
-    ];
+        catch (error) {
+
+            console.log(error);
+
+        }
+
+    };
+
+    useEffect(() => {
+
+        fetchUsers();
+
+    }, []);
 
     return (
-        <div className="sticky top-24">
+        <div className="bg-white border border-gray-200 rounded-[28px] p-5 shadow-[0_4px_30px_rgba(0,0,0,0.04)]">
 
-            <div className="bg-white border border-gray-200 rounded-3xl p-5 shadow-[0_4px_30px_rgba(0,0,0,0.04)]">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
 
-                <h2 className="text-lg font-semibold text-gray-900 mb-5">
-                    Suggested Users
-                </h2>
+                Suggested Users
 
-                <div className="space-y-5">
+            </h2>
 
-                    {
-                        suggestions.map((user) => (
 
-                            <div
-                                key={user.id}
-                                className="flex items-center justify-between"
-                            >
+            <div className="space-y">
 
-                                <div className="flex items-center gap-3">
+                {
+                    users.map((user) => (
 
-                                    <img
-                                        src={`https://i.pravatar.cc/150?img=${user.id + 10}`}
-                                        alt=""
-                                        className="w-12 h-12 rounded-full object-cover ring-2 ring-gray-100"
-                                    />
+                        <Link
+                            to={`/profile/${user.id}`}
+                            key={user.id}
+                            className="block"
+                        >
 
-                                    <div>
+                            <div className="flex items-center gap-4 p-3 rounded-2xl hover:bg-gray-50 transition-all duration-300">
 
-                                        <h3 className="font-medium text-gray-900 text-[15px]">
-                                            {user.name}
-                                        </h3>
+                                <img
+                                    src={
+                                        user.profile_pic ||
+                                        "https://i.pravatar.cc/150"
+                                    }
+                                    alt=""
+                                    className="w-13 h-13 rounded-full object-cover ring-2 ring-gray-100"
+                                />
 
-                                    </div>
+
+                                <div>
+
+                                    <h3 className="font-semibold text-gray-900 text-[15px]">
+
+                                        {user.username}
+
+                                    </h3>
 
                                 </div>
 
-                                <button
-                                    className="px-4 py-1.5 rounded-xl bg-gray-900 hover:bg-black text-white text-sm font-medium transition-all duration-300"
-                                >
-                                    Follow
-                                </button>
-
                             </div>
 
-                        ))
-                    }
+                        </Link>
 
-                </div>
+                    ))
+                }
 
             </div>
 
