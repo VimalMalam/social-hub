@@ -398,6 +398,75 @@ UPDATE users
 SET role = 'admin'
 WHERE email = 'adminn123@yopmail.com';
 
+SELECT id, username, role
+FROM users;
+
+DELIMITER $$
+	
+CREATE PROCEDURE GetAdminStats()
+BEGIN
+	SELECT
+		(SELECT COUNT(*) FROM users) AS totalUsers,
+        (SELECT COUNT(*) FROM posts) AS totalPosts,
+        (SELECT COUNT(*) FROM comments) AS totalComments,
+        (SELECT COUNT(*) FROM followers) AS totalFollowers;
+END $$
+    
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE GetAllUsersForAdmin()
+BEGIN
+	SELECT
+		u.id,
+        u.username,
+        u.email,
+        u.role,
+        u.profile_pic,
+        u.created_at,
+        
+        COUNT(p.id) AS totalPosts
+        
+	FROM users u
+
+    LEFT JOIN posts p
+    ON u.id = p.user_id
+
+    GROUP BY u.id
+    
+    ORDER BY u.created_at DESC;
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE DeleteUserByAdmin(
+	IN p_user_id INT
+)
+BEGIN
+	DELETE FROM comments
+    WHERE user_id = p_user_id;
+    
+    DELETE FROM likes
+    WHERE user_id = p_user_id;
+    
+    DELETE FROM followers
+    WHERE follower_id = p_user_id
+    OR following_id = p_user_id;
+    
+    DELETE FROM posts
+    WHERE user_id = p_user_id;
+    
+    DELETE FROM users
+    WHERE id = p_user_id;
+END $$
+
+DELIMITER ;
+
+
+
 
 
 

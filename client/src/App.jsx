@@ -17,6 +17,7 @@ import VerifyOTP from "./pages/VerifyOTP";
 import CompleteRegister from "./pages/CompleteRegister";
 import CompleteLogin from "./pages/CompleteLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminUsers from "./pages/AdminUsers";
 
 function App() {
 
@@ -58,6 +59,15 @@ function App() {
         element={
           <AdminRoute>
             <AdminDashboard />
+          </AdminRoute>
+        }
+      />
+
+      <Route
+        path="/admin/users"
+        element={
+          <AdminRoute>
+            <AdminUsers />
           </AdminRoute>
         }
       />

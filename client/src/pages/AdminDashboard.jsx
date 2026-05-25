@@ -4,6 +4,7 @@ import {
 } from "react";
 import API from "../api/axios";
 import MainLayout from "../components/layout/MainLayout";
+import { Link } from "react-router-dom";
 
 function AdminDashboard() {
 
@@ -39,76 +40,96 @@ function AdminDashboard() {
 
         <MainLayout>
 
-            <div className="grid grid-cols-4 gap-5">
+            <div className="space-y-6">
 
-                {/* USERS */}
-                <div className="bg-white rounded-2xl p-6">
+                {/* STATS GRID */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
 
-                    <h2 className="text-gray-500 mb-2">
+                    {/* USERS */}
+                    <div className="bg-white border border-gray-200 rounded-[28px] p-6 shadow-[0_4px_30px_rgba(0,0,0,0.04)] hover:translate-y-[-2px] transition-all duration-300">
 
-                        Total Users
+                        <h2 className="text-gray-500 text-sm font-medium mb-3">
 
-                    </h2>
+                            Total Users
 
-                    <h1 className="text-4xl font-bold">
+                        </h2>
 
-                        {stats.totalUsers}
+                        <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
 
-                    </h1>
+                            {stats.totalUsers}
+
+                        </h1>
+
+                    </div>
+
+
+                    {/* POSTS */}
+                    <div className="bg-white border border-gray-200 rounded-[28px] p-6 shadow-[0_4px_30px_rgba(0,0,0,0.04)] hover:translate-y-[-2px] transition-all duration-300">
+
+                        <h2 className="text-gray-500 text-sm font-medium mb-3">
+
+                            Total Posts
+
+                        </h2>
+
+                        <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
+
+                            {stats.totalPosts}
+
+                        </h1>
+
+                    </div>
+
+
+                    {/* COMMENTS */}
+                    <div className="bg-white border border-gray-200 rounded-[28px] p-6 shadow-[0_4px_30px_rgba(0,0,0,0.04)] hover:translate-y-[-2px] transition-all duration-300">
+
+                        <h2 className="text-gray-500 text-sm font-medium mb-3">
+
+                            Total Comments
+
+                        </h2>
+
+                        <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
+
+                            {stats.totalComments}
+
+                        </h1>
+
+                    </div>
+
+
+                    {/* FOLLOWERS */}
+                    <div className="bg-white border border-gray-200 rounded-[28px] p-6 shadow-[0_4px_30px_rgba(0,0,0,0.04)] hover:translate-y-[-2px] transition-all duration-300">
+
+                        <h2 className="text-gray-500 text-sm font-medium mb-3">
+
+                            Total Followers
+
+                        </h2>
+
+                        <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
+
+                            {stats.totalFollowers}
+
+                        </h1>
+
+                    </div>
 
                 </div>
 
 
-                {/* POSTS */}
-                <div className="bg-white rounded-2xl p-6">
+                {/* ACTION BUTTON */}
+                <div>
 
-                    <h2 className="text-gray-500 mb-2">
+                    <Link
+                        to="/admin/users"
+                        className="inline-flex items-center justify-center bg-gray-900 hover:bg-black text-white px-6 py-3 rounded-2xl font-medium transition-all duration-300"
+                    >
 
-                        Total Posts
+                        Manage Users
 
-                    </h2>
-
-                    <h1 className="text-4xl font-bold">
-
-                        {stats.totalPosts}
-
-                    </h1>
-
-                </div>
-
-
-                {/* COMMENTS */}
-                <div className="bg-white rounded-2xl p-6">
-
-                    <h2 className="text-gray-500 mb-2">
-
-                        Total Comments
-
-                    </h2>
-
-                    <h1 className="text-4xl font-bold">
-
-                        {stats.totalComments}
-
-                    </h1>
-
-                </div>
-
-
-                {/* FOLLOWERS */}
-                <div className="bg-white rounded-2xl p-6">
-
-                    <h2 className="text-gray-500 mb-2">
-
-                        Total Followers
-
-                    </h2>
-
-                    <h1 className="text-4xl font-bold">
-
-                        {stats.totalFollowers}
-
-                    </h1>
+                    </Link>
 
                 </div>
 
