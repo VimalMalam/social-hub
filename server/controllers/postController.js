@@ -38,7 +38,7 @@ export const getPosts = (req, res) => {
             "CALL GetPosts(?)", [userId], (err, result) => {
                 if (err) {
                     console.log(err);
-                    
+
                     return res.status(500).json({ message: err.message });
                 }
 
@@ -142,6 +142,35 @@ export const getComments = (req, res) => {
             res.status(200).json(result[0]);
         });
     } catch (error) {
+        res.status(500).json(error);
+    }
+}
+
+// REPORT POST
+export const reportPost = (req, res) => {
+    try {
+        const userId = req.user.id;
+        const postId = req.params.id;
+        const { reason } = req.body;
+
+        db.query(
+            "CALL ReportPost(?, ?, ?)", [userId, postId, reason], (err) => {
+                if (err) {
+                    console.log(err);
+
+                    return res.status(500).json({
+                        message: err.message
+                    });
+                }
+
+                res.status(200).json({
+                    message: "Post reported"
+                });
+            }
+        );
+    } catch (error) {
+        console.log(error);
+
         res.status(500).json(error);
     }
 }

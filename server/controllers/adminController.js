@@ -72,3 +72,55 @@ export const deleteUser = (req, res) => {
         res.status(500).json(error);
     }
 }
+
+// GET ALL POSTS
+export const getAllPosts = (req, res) => {
+    try {
+        db.query(
+            "CALL GetAllPostsForAdmin()", (err, result) => {
+                if (err) {
+                    console.log(err);
+
+                    return res.status(500).json({
+                        message: err.message
+                    });
+                }
+
+                res.status(200).json(
+                    result[0]
+                );
+            }
+        );
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json(error);
+    }
+}
+
+// DELETE POSTS
+export const deletePost = (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        db.query(
+            "CALL DeletePostByAdmin(?)", [userId], (err, result) => {
+                if (err) {
+                    console.log(err);
+
+                    return res.status(500).json({
+                        message: err.message
+                    });
+                }
+
+                res.status(200).json({
+                    message: "Post Deleted"
+                });
+            }
+        );
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json(error);
+    }
+}

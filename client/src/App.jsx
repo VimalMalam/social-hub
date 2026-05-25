@@ -18,6 +18,7 @@ import CompleteRegister from "./pages/CompleteRegister";
 import CompleteLogin from "./pages/CompleteLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
+import AdminPosts from "./pages/AdminPosts";
 
 function App() {
 
@@ -68,6 +69,15 @@ function App() {
         element={
           <AdminRoute>
             <AdminUsers />
+          </AdminRoute>
+        }
+      />
+
+      <Route
+        path="/admin/posts"
+        element={
+          <AdminRoute>
+            <AdminPosts />
           </AdminRoute>
         }
       />

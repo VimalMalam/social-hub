@@ -1,15 +1,17 @@
-import { Link } from "react-router-dom";
-import { Search, Bell, MessageCircle } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Search, Bell, MessageCircle, LogOut } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useEffect, useState } from 'react';
 import API from "../../api/axios.js";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
 
     const [search, setSearch] = useState("");
     const [users, setUsers] = useState([]);
+    const navigate = useNavigate();
 
-    const { user } = useAuth();
+    const { user, setUser } = useAuth();
 
     const searchUsers = async () => {
         try {
@@ -21,6 +23,28 @@ const Navbar = () => {
             setUsers(res.data);
         } catch (error) {
             console.log(error);
+        }
+    }
+
+    // LOGOUT FUNCTION
+    const handleLogout = async () => {
+        try {
+            await API.post("/auth/logout");
+
+            // Clear localStorage
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+
+            // Clear user from context
+            setUser(null);
+
+            toast.success("Logged out successfully");
+
+            // Redirect to login
+            navigate("/login");
+        } catch (error) {
+            console.log(error);
+            toast.error("Logout failed");
         }
     }
 
@@ -60,7 +84,7 @@ const Navbar = () => {
                             type="text"
                             placeholder="Search"
                             value={search}
-                            onChange={(e) => {setSearch(e.target.value)}}
+                            onChange={(e) => { setSearch(e.target.value) }}
                             className="bg-transparent outline-none ml-3 w-full text-sm text-gray-700 placeholder:text-gray-500"
                         />
 
@@ -132,6 +156,15 @@ const Navbar = () => {
                             <span className="hidden md:block font-semibold text-gray-800 text-lg">
                                 {user?.username}
                             </span>
+
+                            {/* LOGOUT BUTTON */}
+                            <button
+                                onClick={handleLogout}
+                                className="w-11 h-11 rounded-2xl bg-red-100 hover:bg-red-200 transition-all duration-300 flex items-center justify-center text-red-600"
+                                title="Logout"
+                            >
+                                <LogOut size={20} />
+                            </button>
 
                         </div>
 

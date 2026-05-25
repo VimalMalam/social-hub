@@ -25,55 +25,48 @@ function CompleteLogin() {
 
 
     useEffect(() => {
-
         const finishLogin = async () => {
-
             try {
-
                 // FINAL LOGIN
                 const res = await API.post(
                     "/auth/complete-login",
                     { user }
                 );
 
+                // ✅ Store token from response
+                if (res.data.token) {
+                    localStorage.setItem("token", res.data.token);
+                }
 
-                setUser(user);
-
-                localStorage.setItem(
-                    "user",
-                    JSON.stringify(user)
-                );
-
+                // ✅ Store user properly
+                if (res.data.user) {
+                    localStorage.setItem("user", JSON.stringify(res.data.user));
+                    setUser(res.data.user);
+                }
 
                 toast.success(res.data.message);
 
-                const redirectPath = user?.role === "admin" ? "/admin" : "/";
-
+                const redirectPath = res.data.user?.role === "admin" ? "/admin" : "/";
                 navigate(redirectPath);
 
-            }
-            catch (error) {
-
+            } catch (error) {
                 console.log(error);
+
+                // Clear invalid data
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
 
                 toast.error(
                     error.response?.data?.message ||
                     "Login failed"
                 );
-
                 navigate("/login");
-
             }
-
         };
 
-
         if (user) {
-
             finishLogin();
-
         }
-
     }, []);
 
 

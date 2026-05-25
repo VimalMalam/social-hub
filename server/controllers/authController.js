@@ -181,6 +181,7 @@ export const completeLogin = (req, res) => {
 
         res.status(200).json({
             message: "Login successful",
+            token,
             user
         });
     } catch (error) {

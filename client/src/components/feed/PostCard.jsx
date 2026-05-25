@@ -1,9 +1,10 @@
-import { Heart, MessageCircle, Send } from "lucide-react";
+import { Heart, MessageCircle, Send, Info } from "lucide-react";
 import { useState } from "react";
 import 'react'
 import API from "../../api/axios.js";
 import CommentModal from "./CommentModal.jsx";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const PostCard = ({ post, fetchPosts }) => {
 
@@ -21,6 +22,24 @@ const PostCard = ({ post, fetchPosts }) => {
             }
 
             fetchPosts();
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const handleReport = async () => {
+        try {
+            const reason = prompt(
+                "Why are you reporting this post?"
+            );
+
+            if (!reason) return;
+
+            const res = await API.post(
+                `/posts/report/${post.id}`, {reason}
+            );
+
+            toast.success(res.data.message);
         } catch (error) {
             console.log(error);
         }
@@ -56,6 +75,15 @@ const PostCard = ({ post, fetchPosts }) => {
                     </div>
 
                 </div>
+
+                <button
+                    onClick={handleReport}
+                    className="text-red-500 font-semibold cursor-pointer"
+                >
+
+                    <Info size={22}/>
+
+                </button>
 
             </div>
 

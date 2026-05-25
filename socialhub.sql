@@ -465,6 +465,90 @@ END $$
 
 DELIMITER ;
 
+CREATE TABLE reports (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    post_id INT,
+    reason TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (user_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE,
+    
+    FOREIGN KEY (post_id)
+    REFERENCES posts(id)
+    ON DELETE CASCADE
+);
+
+DELIMITER $$
+
+CREATE PROCEDURE GetAllPostsForAdmin()
+BEGIN
+	SELECT
+		p.id,
+        p.caption,
+        p.image,
+        p.created_at,
+        
+        u.username,
+        u.profile_pic,
+        
+        COUNT(r.id) AS totalReports
+	FROM posts p
+    JOIN users u
+    ON p.user_id = u.id
+    LEFT JOIN reports r
+    ON p.id = r.post_id
+    GROUP BY p.id
+    ORDER BY p.created_at DESC;
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE DeletePostByAdmin(
+	IN p_post_id INT
+)
+BEGIN
+	DELETE FROM comments
+    WHERE post_id = p_post_id;
+    
+    DELETE FROM likes
+    WHERE post_id = p_post_id;
+    
+    DELETE FROM reports
+    WHERE post_id = p_post_id;
+    
+    DELETE FROM posts
+    WHERE id = p_post_id;
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE ReportPost(
+	IN p_user_id INT,
+    IN p_post_id INT,
+    IN p_reason TEXT
+)
+BEGIN
+	INSERT INTO reports(
+		user_id,
+        post_id,
+        reason
+    )
+    VALUES(
+		p_user_id,
+        p_post_id,
+        p_reason
+    );
+END $$
+
+DELIMITER ;
+
 
 
 

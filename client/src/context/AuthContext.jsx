@@ -10,15 +10,32 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const loadUser = async () => {
             try {
-                // Try to fetch current user from server (protected route)
-                const res = await API.get("/users/me"); // ensure axios has credentials
-                const currentUser = res.data;
-                setUser(currentUser);
-                localStorage.setItem("user", JSON.stringify(currentUser));
+                // First check if we have stored user and token
+                const storedUser = localStorage.getItem("user");
+                const storedToken = localStorage.getItem("token");
+
+                if (storedUser && storedToken) {
+                    // ✅ Set user from localStorage immediately (don't wait for server)
+                    setUser(JSON.parse(storedUser));
+                    
+                    // ✅ Then try to verify/refresh from server in the background
+                    try {
+                        const res = await API.get("/users/me");
+                        if (res.data && res.data.id) {
+                            // Update with fresh data from server
+                            setUser(res.data);
+                            localStorage.setItem("user", JSON.stringify(res.data));
+                        }
+                    } catch (serverErr) {
+                        console.log("Could not refresh user from server, using stored data");
+                        // Keep using stored user data - don't clear it
+                    }
+                } else {
+                    setUser(null);
+                }
             } catch (err) {
-                // fallback to localStorage if API call fails (e.g., no cookie/token)
-                const stored = localStorage.getItem("user");
-                if (stored) setUser(JSON.parse(stored));
+                console.log("Auth check failed:", err);
+                setUser(null);
             } finally {
                 setLoading(false);
             }

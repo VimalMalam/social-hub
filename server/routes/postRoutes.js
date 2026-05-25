@@ -1,5 +1,5 @@
 import express from 'express';
-import {createPost, getPosts, likePost, unlikePost, addComment, getComments } from "../controllers/postController.js";
+import {createPost, getPosts, likePost, unlikePost, addComment, getComments, reportPost } from "../controllers/postController.js";
 import { verifyToken } from '../middleware/authMiddleware.js';
 import upload from "../middleware/uploadMiddleware.js";
 
@@ -22,5 +22,8 @@ router.post("/comment", verifyToken, addComment);
 
 // GET COMMENTS
 router.get("/comments/:postId", verifyToken, getComments);
+
+// REPORT POST
+router.post("/report/:id", verifyToken, reportPost);
 
 export default router;

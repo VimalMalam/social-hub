@@ -46,7 +46,7 @@ function AdminDashboard() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
 
                     {/* USERS */}
-                    <div className="bg-white border border-gray-200 rounded-[28px] p-6 shadow-[0_4px_30px_rgba(0,0,0,0.04)] hover:translate-y-[-2px] transition-all duration-300">
+                    <div className="bg-white border border-gray-200 rounded-[28px] p-6 shadow-[0_4px_30px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 transition-all duration-300">
 
                         <h2 className="text-gray-500 text-sm font-medium mb-3">
 
@@ -128,6 +128,15 @@ function AdminDashboard() {
                     >
 
                         Manage Users
+
+                    </Link>
+
+                    <Link
+                        to="/admin/posts"
+                        className="bg-black text-white px-5 py-3 rounded-xl inline-block mt-4 ml-4"
+                    >
+
+                        Manage Posts
 
                     </Link>
 

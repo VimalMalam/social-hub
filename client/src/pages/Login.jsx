@@ -32,6 +32,18 @@ const Login = () => {
                 formData
             );
 
+            localStorage.setItem(
+                "token",
+                res.data.token
+            );
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify(res.data.user)
+            );
+
+            // setUser(res.data.user);
+
             toast.success(res.data.message);
 
             navigate("/verify-otp", {
