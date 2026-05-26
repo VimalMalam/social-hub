@@ -3,8 +3,11 @@ import { useEffect, useState, useRef } from "react";
 import API from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import socket from "../socket";
+import { data } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const Messages = () => {
+    const location = useLocation();
 
     const { user } = useAuth();
     const [conversations, setConversations] = useState([]);
@@ -37,7 +40,7 @@ const Messages = () => {
         };
 
         fetchConversations();
-    }, []);
+    }, [location.state]);
 
     useEffect(() => {
         const fetchMessages = async () => {
@@ -53,131 +56,300 @@ const Messages = () => {
         };
 
         fetchMessages();
-    }, [currentChat])
+    }, [currentChat]);
+
+    const handleSend = async () => {
+        if (!text.trim()) return;
+
+        try {
+            // SOCKET SEND
+            socket.emit(
+                "sendMessage",
+                {
+                    senderId: user.id,
+                    receiverId: currentChat.userId,
+                    message: text
+                }
+            );
+
+            // DATABASE SAVE
+            await API.post("/chat/message", { conversationId: currentChat.id, message: text });
+
+            // LOCAL UI UPDATE
+            setMessages((prev) => [...prev, { id: Date.now() + Math.random(), sender_id: user.id, message: text }]);
+            setText("");
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        const receiverMessage = (data) => {
+            setMessages((prev) => [...prev, { id: Date.now(), sender_id: data.senderId, message: data.message }]);
+        };
+
+        socket.on("getMessage", receiverMessage);
+
+        return () => {
+            socket.off("getMessage", receiverMessage);
+        };
+    }, []);
+
+    useEffect(() => {
+        scrollRef.current?.scrollIntoView({
+            behavior: "smooth"
+        });
+    }, [messages]);
 
     return (
         <MainLayout>
-            <div className="bg-white rounded-2xl h-[85vh] flex overflow-hidden">
+
+            <div className="bg-white border border-gray-200 rounded-[24px] sm:rounded-[28px] md:rounded-[36px] overflow-hidden shadow-[0_4px_30px_rgba(0,0,0,0.04)] h-[85vh] flex">
+
                 {/* SIDEBAR */}
-                <div className="w-87.5 border-r">
-                    <h1 className="text-2xl font-bold p-5">
-                        Messages
-                    </h1>
+                <div className={`${currentChat ? "hidden lg:flex" : "flex"} w-full lg:w-[360px] border-r border-gray-100 flex-col bg-white`}>
+
+                    {/* HEADER */}
+                    <div className="px-5 sm:px-6 py-5 border-b border-gray-100">
+
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+
+                            Messages
+
+                        </h1>
+
+                    </div>
+
+
+                    {/* CONVERSATIONS */}
+                    <div className="flex-1 overflow-y-auto p-3 space-y-2">
+
+                        {
+                            conversations.map((conversation) => {
+
+                                const isOnline = onlineUsers.some(
+                                    (u) =>
+                                        u.userId === conversation.userId
+                                );
+
+                                return (
+
+                                    <div
+                                        key={conversation.id}
+                                        onClick={() =>
+                                            setCurrentChat(conversation)
+                                        }
+                                        className={`flex items-center justify-between gap-3 p-3 sm:p-4 rounded-3xl cursor-pointer transition-all duration-300 border ${currentChat?.id === conversation.id
+                                            ? "bg-gray-100 border-gray-200"
+                                            : "border-transparent hover:bg-gray-50"
+                                            }`}
+                                    >
+
+                                        <div className="flex items-center gap-4 min-w-0">
+
+                                            {/* PROFILE */}
+                                            <div className="relative shrink-0">
+
+                                                <img
+                                                    src={
+                                                        conversation.profile_pic ||
+                                                        "https://i.pravatar.cc/150"
+                                                    }
+                                                    alt=""
+                                                    className="w-13 h-13 rounded-full object-cover"
+                                                />
+
+                                                <span
+                                                    className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white ${isOnline
+                                                        ? "bg-green-500"
+                                                        : "bg-gray-300"
+                                                        }`}
+                                                />
+
+                                            </div>
+
+
+                                            {/* USER INFO */}
+                                            <div className="min-w-0">
+
+                                                <h2 className="font-semibold text-gray-900 truncate text-[15px]">
+
+                                                    {conversation.username}
+
+                                                </h2>
+
+                                                <p className={`text-sm mt-1 ${isOnline
+                                                    ? "text-green-600"
+                                                    : "text-gray-500"
+                                                    }`}>
+
+                                                    {
+                                                        isOnline
+                                                            ? "Online"
+                                                            : "Offline"
+                                                    }
+
+                                                </p>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                )
+                            })
+                        }
+
+                    </div>
+
+                </div>
+
+
+                {/* CHAT AREA */}
+                <div className={`${currentChat ? "flex" : "hidden lg:flex"} flex-1 flex-col bg-white`}>
+
                     {
-                        conversations.map((conversation) => {
-                            const isOnline = onlineUsers.some(
-                                (u) =>
-                                    u.userId === conversation.userId
-                            );
-                            return (
-                                <div
-                                    key={conversation.id}
-                                    onClick={() =>
-                                        setCurrentChat(conversation)
-                                    }
-                                    className="flex items-center justify-between p-4 hover:bg-gray-100 cursor-pointer"
-                                >
-                                    <div className="flex items-center gap-3">
+                        currentChat ? (
+
+                            <>
+
+                                {/* CHAT HEADER */}
+                                <div className="px-4 sm:px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-4 bg-white">
+
+                                    <div className="flex items-center gap-4 min-w-0">
+
+                                        {/* MOBILE BACK */}
+                                        <button
+                                            onClick={() => setCurrentChat(null)}
+                                            className="lg:hidden bg-gray-100 hover:bg-gray-200 w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-300"
+                                        >
+                                            ←
+                                        </button>
+
+
+                                        {/* PROFILE */}
                                         <img
                                             src={
-                                                conversation.profile_pic ||
+                                                currentChat.profile_pic ||
                                                 "https://i.pravatar.cc/150"
                                             }
                                             alt=""
                                             className="w-12 h-12 rounded-full object-cover"
                                         />
-                                        <div>
-                                            <h2 className="font-semibold">
-                                                {conversation.username}
-                                            </h2>
-                                            <p className="text-sm text-gray-500">
-                                                {
-                                                    isOnline
-                                                        ? "Online"
-                                                        : "Offline"
-                                                }
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            )
-                        })
-                    }
-                </div>
 
-                {/* CHAT AREA */}
-                <div className="flex-1 flex flex-col">
-                    {
-                        currentChat ? (
-                            <>
-                                {/* HEADER */}
-                                <div className="p-5 border-b flex items-center gap-3">
-                                    <img
-                                        src={
-                                            currentChat.profile_pic ||
-                                            "https://i.pravatar.cc/150"
-                                        }
-                                        alt=""
-                                        className="w-12 h-12 rounded-full object-cover"
-                                    />
-                                    <h2 className="font-bold text-lg">
-                                        {currentChat.username}
-                                    </h2>
+
+                                        {/* NAME */}
+                                        <div className="min-w-0">
+
+                                            <h2 className="font-bold text-gray-900 text-lg truncate">
+
+                                                {currentChat.username}
+
+                                            </h2>
+
+                                        </div>
+
+                                    </div>
+
                                 </div>
+
 
                                 {/* MESSAGES */}
-                                <div className="flex-1 overflow-y-auto p-5 space-y-4">
+                                <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-5 space-y-4 bg-gray-50">
+
                                     {
-                                        messages.map((message) => (
+                                        messages.map((message, index) => (
+
                                             <div
-                                                key={message.id}
-                                                ref={scrollRef}
+                                                key={message.id || index}
+                                                ref={messages.length - 1 === index ? scrollRef : null}
                                                 className={`flex ${message.sender_id === user.id
                                                     ? "justify-end"
                                                     : "justify-start"
                                                     }`}
                                             >
+
                                                 <div
-                                                    className={`px-4 py-3 rounded-2xl max-w-[300px] ${message.sender_id === user.id
-                                                        ? "bg-black text-white"
-                                                        : "bg-gray-100"
+                                                    className={`px-5 py-3 rounded-[24px] max-w-[80%] sm:max-w-[70%] break-words text-[15px] leading-relaxed shadow-sm ${message.sender_id === user.id
+                                                        ? "bg-gray-900 text-white rounded-br-md"
+                                                        : "bg-white border border-gray-100 text-gray-800 rounded-bl-md"
                                                         }`}
                                                 >
+
                                                     {message.message}
+
                                                 </div>
+
                                             </div>
+
                                         ))
                                     }
+
                                 </div>
 
+
                                 {/* INPUT */}
-                                <div className="p-5 border-t flex gap-3">
-                                    <input
-                                        type="text"
-                                        placeholder="Write message..."
-                                        className="flex-1 border rounded-xl px-4"
-                                        value={text}
-                                        onChange={(e) =>
-                                            setText(e.target.value)
-                                        }
-                                    />
-                                    <button
-                                        className="bg-black text-white px-6 rounded-xl"
-                                    >
-                                        Send
-                                    </button>
+                                <div className="p-4 sm:p-5 border-t border-gray-100 bg-white">
+
+                                    <div className="flex items-center gap-3">
+
+                                        <input
+                                            type="text"
+                                            placeholder="Write message..."
+                                            className="flex-1 bg-gray-100 border border-transparent focus:border-gray-300 rounded-2xl px-5 py-3.5 outline-none text-gray-800 placeholder:text-gray-500 transition-all duration-300"
+                                            value={text}
+                                            onChange={(e) =>
+                                                setText(e.target.value)
+                                            }
+                                        />
+
+                                        <button
+                                            onClick={handleSend}
+                                            className="bg-gray-900 hover:bg-black text-white px-6 sm:px-7 py-3.5 rounded-2xl font-medium transition-all duration-300 shrink-0"
+                                        >
+
+                                            Send
+
+                                        </button>
+
+                                    </div>
+
                                 </div>
+
                             </>
+
                         ) : (
-                            <div className="flex items-center justify-center h-full">
-                                <h1 className="text-2xl text-gray-400">
-                                    Open a conversation
+
+                            <div className="hidden lg:flex flex-col items-center justify-center h-full text-center px-6">
+
+                                <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-6 text-4xl">
+
+                                    💬
+
+                                </div>
+
+                                <h1 className="text-3xl font-bold text-gray-900 mb-3">
+
+                                    Your Messages
+
                                 </h1>
+
+                                <p className="text-gray-500 text-[15px] max-w-sm leading-relaxed">
+
+                                    Select a conversation to start chatting with your friends.
+
+                                </p>
+
                             </div>
+
                         )
                     }
+
                 </div>
+
             </div>
+
         </MainLayout>
     )
 }

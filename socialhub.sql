@@ -660,6 +660,40 @@ END $$
 
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS CreateConversation;
+
+DELIMITER $$
+
+CREATE PROCEDURE CreateConversation(
+    IN p_sender_id INT,
+    IN p_receiver_id INT
+)
+BEGIN
+    IF NOT EXISTS (
+        SELECT * FROM conversations
+        WHERE (
+            sender_id = p_sender_id
+            AND receiver_id = p_receiver_id
+        )
+        OR (
+            sender_id = p_receiver_id
+            AND receiver_id = p_sender_id
+        )
+    )
+    THEN
+        INSERT INTO conversations(
+            sender_id,
+            receiver_id
+        )
+        VALUES(
+            p_sender_id,
+            p_receiver_id
+        );
+    END IF;
+END $$
+
+DELIMITER ;
+
 
 
 

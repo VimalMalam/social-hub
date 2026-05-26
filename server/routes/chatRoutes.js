@@ -14,6 +14,6 @@ router.post("/message", verifyToken, sendMessage);
 router.get("/conversations", verifyToken, getConversations);
 
 // GET MESSAGES
-router.get("/message/:id", verifyToken, getMessages);
+router.get("/messages/:id", verifyToken, getMessages);
 
 export default router;
