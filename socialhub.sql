@@ -549,6 +549,80 @@ END $$
 
 DELIMITER ;
 
+CREATE TABLE conversations (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+    sender_id INT,
+    receiver_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (sender_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE,
+    
+    FOREIGN KEY (receiver_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE messages (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+    conversation_id INT,
+    sender_id INT,
+    message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (conversation_id)
+    REFERENCES conversations(id)
+    ON DELETE CASCADE,
+
+    FOREIGN KEY (sender_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE
+);
+
+DELIMITER $$
+	
+	CREATE PROCEDURE CreateConversation(
+		IN p_sender_id INT,
+        IN p_receiver_id INT
+    )
+    BEGIN
+		INSERT INTO conversations(
+			sender_id,
+            receiver_id
+        )
+        VALUES(
+			p_sender_id,
+            p_receiver_id
+        );
+    END $$
+    
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS SendMessage;
+
+DELIMITER $$
+
+CREATE PROCEDURE SendMessage(
+    IN p_conversation_id INT,
+    IN p_sender_id INT,
+    IN p_message TEXT
+)
+BEGIN
+    INSERT INTO messages(
+        conversation_id,
+        sender_id,
+        message
+    )
+    VALUES(
+        p_conversation_id,
+        p_sender_id,
+        p_message
+    );
+END $$
+
+DELIMITER ;
+
 
 
 
