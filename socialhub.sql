@@ -622,7 +622,43 @@ BEGIN
 END $$
 
 DELIMITER ;
+DROP PROCEDURE IF EXISTS GetConversations;
+DELIMITER $$
 
+CREATE PROCEDURE GetConversations(
+	IN p_user_id INT
+)
+BEGIN
+	SELECT
+		c.id,
+        
+        u.id AS userId,
+        u.username,
+        u.profile_pic
+	FROM conversations c
+    JOIN users u
+	ON (
+		(u.id = c.sender_id AND c.receiver_id = p_user_id)
+        OR
+        (u.id = c.receiver_id AND c.sender_id = p_user_id)
+    )
+    ORDER BY c.created_at DESC;
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE GetMessages(
+	IN p_conversation_id INT
+)
+BEGIN
+	SELECT * FROM messages
+    WHERE conversation_id = p_conversation_id
+    ORDER BY created_at ASC;
+END $$
+
+DELIMITER ;
 
 
 

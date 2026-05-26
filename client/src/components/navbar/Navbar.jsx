@@ -135,11 +135,11 @@ const Navbar = () => {
                         </button>
 
                         {/* MESSAGE */}
-                        <button
+                        <Link to="/messages"
                             className="w-11 h-11 rounded-2xl bg-gray-100 hover:bg-gray-200 transition-all duration-300 flex items-center justify-center text-gray-700"
                         >
                             <MessageCircle size={20} />
-                        </button>
+                        </Link>
 
                         {/* PROFILE */}
                         <div className="flex items-center gap-3 pl-1 cursor-pointer">

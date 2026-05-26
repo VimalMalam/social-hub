@@ -19,27 +19,20 @@ import CompleteLogin from "./pages/CompleteLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminPosts from "./pages/AdminPosts";
+import Messages from "./pages/Messages";
 
 function App() {
 
   const { loading } = useAuth();
 
   if (loading) {
-
     return (
-
       <div className="h-screen flex items-center justify-center">
-
         <h1 className="text-2xl font-bold">
-
           Loading...
-
         </h1>
-
       </div>
-
     )
-
   }
 
   return (
@@ -51,6 +44,15 @@ function App() {
         element={
           <ProtectedRoute>
             <Home />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/messages"
+        element={
+          <ProtectedRoute>
+            <Messages />
           </ProtectedRoute>
         }
       />
