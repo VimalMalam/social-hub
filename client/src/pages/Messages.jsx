@@ -56,7 +56,19 @@ const Messages = () => {
             }
         };
 
-        fetchMessages();
+        const markRead = async () => {
+            try {
+                await API.put("/chat/read", { conversationId: currentChat.id });
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        if (currentChat) {
+            markRead();
+            fetchMessages();
+        }
+
     }, [currentChat]);
 
     const handleSend = async () => {
@@ -254,7 +266,6 @@ const Messages = () => {
                                             ←
                                         </button>
 
-
                                         {/* PROFILE */}
                                         <img
                                             src={
@@ -264,7 +275,6 @@ const Messages = () => {
                                             alt=""
                                             className="w-12 h-12 rounded-full object-cover"
                                         />
-
 
                                         {/* NAME */}
                                         <div className="min-w-0">
@@ -319,8 +329,18 @@ const Messages = () => {
                                                                 }
                                                             )
                                                         }
+                                                        {
+                                                            message.sender_id === user.id && (
+                                                                <p className="text-[10px] opacity-70 mt-1 text-right">
+                                                                    {
+                                                                        message.is_read
+                                                                            ? "Seen"
+                                                                            : "Sent"
+                                                                    }
+                                                                </p>
+                                                            )
+                                                        }
                                                     </p>
-
 
                                                 </div>
 

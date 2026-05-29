@@ -109,3 +109,24 @@ export const getMessages = (req, res) => {
         res.status(500).json(error);
     }
 }
+
+// MARK AS READ
+export const markAsRead = async (req, res) => {
+    try {
+        const {conversationId} = req.body;
+
+        await db.query(
+            "CALL MarkMessagesAsRead(?, ?)", [conversationId, req.user.id]
+        );
+
+        res.json({
+            message: "Messages marked as read"
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: "Server Error"
+        });
+    }
+};
+

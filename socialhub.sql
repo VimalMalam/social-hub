@@ -786,6 +786,21 @@ END $$
 
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS MarkMessagesAsRead;
+
+DELIMITER $$
+CREATE PROCEDURE MarkMessagesAsRead(
+	IN p_conversation_id INT,
+    IN p_user_id INT
+)
+BEGIN
+	UPDATE messages
+    SET is_read = TRUE
+    WHERE conversation_id = p_conversation_id
+    AND sender_id != p_user_id;
+END $$
+DELIMITER ;
+
 
 
 

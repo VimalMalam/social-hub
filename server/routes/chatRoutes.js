@@ -1,5 +1,5 @@
 import express from "express";
-import { createConversation, sendMessage, getConversations, getMessages } from "../controllers/chatController.js";
+import { createConversation, sendMessage, getConversations, getMessages, markAsRead } from "../controllers/chatController.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -15,5 +15,8 @@ router.get("/conversations", verifyToken, getConversations);
 
 // GET MESSAGES
 router.get("/messages/:id", verifyToken, getMessages);
+
+// MARK AS READ
+router.put("/read", verifyToken, markAsRead);
 
 export default router;
