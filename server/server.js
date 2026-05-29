@@ -91,6 +91,15 @@ io.on("connection", (socket) => {
         );
     });
 
+    // TYPING...
+    socket.on("typing", (data) => {
+        const receiver = onlineUsers.find((user) => user.userId === data.receiverId);
+
+        if (receiver) {
+            io.to(receiver.socketId).emit("showTyping", { senderId: data.senderId });
+        }
+    });
+
 });
 
 app.use(express.json());

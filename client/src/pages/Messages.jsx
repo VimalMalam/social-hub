@@ -16,6 +16,7 @@ const Messages = () => {
     const [text, setText] = useState("");
     const [onlineUsers, setOnlineUsers] = useState([]);
     const scrollRef = useRef();
+    const [typing, setTyping] = useState(false);
 
     useEffect(() => {
         socket.emit("addUser", user.id);
@@ -101,6 +102,16 @@ const Messages = () => {
         });
     }, [messages]);
 
+    useEffect(() => {
+        socket.on("showTyping", () => {
+            setTyping(true);
+
+            setTimeout(() => {
+                setTyping(false);
+            }, 2000);
+        });
+    }, []);
+
     return (
         <MainLayout>
 
@@ -184,14 +195,30 @@ const Messages = () => {
                                                     }`}>
 
                                                     {
-                                                        isOnline
-                                                            ? "Online"
-                                                            : "Offline"
+                                                        conversation.lastMessage ||
+                                                        (
+                                                            isOnline
+                                                                ? "Online"
+                                                                : "Offline"
+                                                        )
                                                     }
 
                                                 </p>
 
                                             </div>
+
+                                            {/* UNREAD BADGE */}
+                                            {
+                                                conversation.unreadCount > 0 && (
+
+                                                    <div className="bg-black text-white text-xs font-semibold min-w-[24px] h-6 px-2 rounded-full flex items-center justify-center">
+
+                                                        {conversation.unreadCount}
+
+                                                    </div>
+
+                                                )
+                                            }
 
                                         </div>
 
@@ -271,13 +298,29 @@ const Messages = () => {
                                             >
 
                                                 <div
-                                                    className={`px-5 py-3 rounded-[24px] max-w-[80%] sm:max-w-[70%] break-words text-[15px] leading-relaxed shadow-sm ${message.sender_id === user.id
+                                                    className={`px-5 py-3 rounded-[24px] max-w-[80%] sm:max-w-[70%] break-words text-[16px] leading-relaxed shadow-sm ${message.sender_id === user.id
                                                         ? "bg-gray-900 text-white rounded-br-md"
                                                         : "bg-white border border-gray-100 text-gray-800 rounded-bl-md"
                                                         }`}
                                                 >
 
-                                                    {message.message}
+                                                    <p>{message.message}</p>
+
+                                                    <p className="text-[11px] mt-1 opacity-70">
+                                                        {
+                                                            new Date(
+                                                                message.created_at ||
+                                                                Date.now()
+                                                            ).toLocaleTimeString(
+                                                                [],
+                                                                {
+                                                                    hour: "2-digit",
+                                                                    minute: "2-digit"
+                                                                }
+                                                            )
+                                                        }
+                                                    </p>
+
 
                                                 </div>
 
@@ -293,15 +336,22 @@ const Messages = () => {
                                 <div className="p-4 sm:p-5 border-t border-gray-100 bg-white">
 
                                     <div className="flex items-center gap-3">
-
+                                        {
+                                            typing && (
+                                                <div className="px-5 py-2 text-sm text-gray-500">
+                                                    Typing...
+                                                </div>
+                                            )
+                                        }
                                         <input
                                             type="text"
                                             placeholder="Write message..."
                                             className="flex-1 bg-gray-100 border border-transparent focus:border-gray-300 rounded-2xl px-5 py-3.5 outline-none text-gray-800 placeholder:text-gray-500 transition-all duration-300"
                                             value={text}
-                                            onChange={(e) =>
-                                                setText(e.target.value)
-                                            }
+                                            onChange={(e) => {
+                                                setText(e.target.value);
+                                                socket.emit("typing", { senderId: user.id, receiverId: currentChat.userId });
+                                            }}
                                         />
 
                                         <button

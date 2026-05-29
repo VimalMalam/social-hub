@@ -626,23 +626,47 @@ DROP PROCEDURE IF EXISTS GetConversations;
 DELIMITER $$
 
 CREATE PROCEDURE GetConversations(
-	IN p_user_id INT
+    IN p_user_id INT
 )
 BEGIN
-	SELECT
-		c.id,
-        
+    SELECT
+        c.id,
+
         u.id AS userId,
         u.username,
-        u.profile_pic
-	FROM conversations c
+        u.profile_pic,
+        -- LAST MESSAGE
+        (
+            SELECT m.message
+            FROM messages m
+            WHERE m.conversation_id = c.id
+            ORDER BY m.created_at DESC
+            LIMIT 1
+        ) AS lastMessage,
+        -- LAST MESSAGE TIME
+        (
+            SELECT m.created_at
+            FROM messages m
+            WHERE m.conversation_id = c.id
+            ORDER BY m.created_at DESC
+            LIMIT 1
+        ) AS lastMessageTime,
+        -- UNREAD COUNT
+        (
+            SELECT COUNT(*)
+            FROM messages m
+            WHERE m.conversation_id = c.id
+            AND m.sender_id != p_user_id
+            AND m.is_read = FALSE
+        ) AS unreadCount
+    FROM conversations c
     JOIN users u
-	ON (
-		(u.id = c.sender_id AND c.receiver_id = p_user_id)
+    ON (
+        (u.id = c.sender_id AND c.receiver_id = p_user_id)
         OR
         (u.id = c.receiver_id AND c.sender_id = p_user_id)
     )
-    ORDER BY c.created_at DESC;
+    ORDER BY lastMessageTime DESC;
 END $$
 
 DELIMITER ;
@@ -690,6 +714,74 @@ BEGIN
             p_receiver_id
         );
     END IF;
+END $$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS GetConversations;
+
+DELIMITER $$
+
+CREATE PROCEDURE GetConversations(
+    IN p_user_id INT
+)
+BEGIN
+    SELECT
+        c.id,
+
+        u.id AS userId,
+        u.username,
+        u.profile_pic,
+        (
+            SELECT m.message
+            FROM messages m
+            WHERE m.conversation_id = c.id
+            ORDER BY m.created_at DESC
+            LIMIT 1
+        ) AS lastMessage,
+        (
+            SELECT m.created_at
+            FROM messages m
+            WHERE m.conversation_id = c.id
+            ORDER BY m.created_at DESC
+            LIMIT 1
+        ) AS lastMessageTime
+    FROM conversations c
+    JOIN users u
+    ON (
+        (u.id = c.sender_id AND c.receiver_id = p_user_id)
+        OR
+        (u.id = c.receiver_id AND c.sender_id = p_user_id)
+    )
+    ORDER BY lastMessageTime DESC;
+END $$
+
+DELIMITER ;
+
+ALTER TABLE messages
+ADD is_read BOOLEAN DEFAULT FALSE;
+
+DROP PROCEDURE IF EXISTS SendMessage;
+
+DELIMITER $$
+
+CREATE PROCEDURE SendMessage(
+	IN p_conversation_id INT,
+    IN p_sender_id INT,
+    IN p_message TEXT
+)
+BEGIN
+	INSERT INTO messages(
+		conversation_id,
+        sender_id,
+        message,
+        is_read
+    ) VALUES (
+		p_conversation_id,
+        p_sender_id,
+        p_message,
+        FALSE
+    );
 END $$
 
 DELIMITER ;
