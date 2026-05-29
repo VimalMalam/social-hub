@@ -13,6 +13,7 @@ import postRoutes from "./routes/postRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 dotenv.config();
 
@@ -62,7 +63,6 @@ io.on("connection", (socket) => {
     // SEND MESSAGE
     socket.on("sendMessage", (data) => {
         const receiver = onlineUsers.find(
-
             (user) =>
                 user.userId === data.receiverId
         );
@@ -100,12 +100,30 @@ io.on("connection", (socket) => {
         }
     });
 
+    // SEND NOTIFICATION
+    socket.on("sendNotification", (data) => {
+        const receiver = onlineUsers.find(
+            (user) =>
+                user.userId === data.receiverId
+        );
+        if (receiver) {
+            io.to(receiver.socketId).emit(
+                "getNotification",
+                data
+            );
+        }
+    });
 });
 
 app.use(express.json());
 
 app.use(cookieParser());
 
+// SOCKET ACCESS IN CONTROLLERS
+app.use((req, res, next) => {
+    req.io = io;
+    next();
+});
 
 // ROUTES
 app.use("/api/auth", authRoutes);
@@ -113,6 +131,7 @@ app.use("/api/posts", postRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 
 app.get("/", (req, res) => {

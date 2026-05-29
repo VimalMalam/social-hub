@@ -52,26 +52,83 @@ export const getPosts = (req, res) => {
 
 // LIKE POST
 export const likePost = (req, res) => {
+
     try {
         const userId = req.user.id;
-
         const { postId } = req.body;
 
-        db.query("CALL LikePost(?, ?)", [userId, postId], (err, result) => {
-            if (err) {
-                console.log(err);
+        // GET POST
+        db.query(
+            "SELECT * FROM posts WHERE id = ?",
+            [postId],
+            (err, postResult) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({
+                        message: err.message
+                    });
+                }
 
-                return res.status(500).json({
-                    message: err.message
-                });
+                // CHECK POST EXISTS
+                if (postResult.length === 0) {
+                    return res.status(404).json({
+                        message: "Post not found"
+                    });
+                }
+
+                const post = postResult[0];
+
+                // LIKE POST
+                db.query(
+                    "CALL LikePost(?, ?)",
+                    [userId, postId],
+                    (err) => {
+                        if (err) {
+                            console.log(err);
+                            return res.status(500).json({
+                                message: err.message
+                            });
+                        }
+
+
+                        // DON'T NOTIFY SELF
+                        if (userId !== post.user_id) {
+                            // SAVE NOTIFICATION
+                            db.query(
+                                "CALL CreateNotification(?, ?, ?, ?, ?)",
+                                [
+                                    userId,
+                                    post.user_id,
+                                    postId,
+                                    "like",
+                                    "liked your post"
+                                ]
+                            );
+
+                            // REALTIME NOTIFICATION
+                            req.io.emit(
+                                "getNotification",
+                                {
+                                    receiverId: post.user_id,
+                                    senderId: userId,
+                                    message: "liked your post"
+                                }
+                            );
+                        }
+
+                        res.status(200).json({
+                            message: "Post liked"
+                        });
+                    }
+                );
             }
-
-            res.status(200).json({
-                message: "Post Liked"
-            });
+        );
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: "Server Error"
         });
-    } catch (error) {
-        res.status(500).json(error);
     }
 };
 

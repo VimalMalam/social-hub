@@ -801,6 +801,79 @@ BEGIN
 END $$
 DELIMITER ;
 
+CREATE TABLE notification (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+    sender_id INT,
+    receiver_id INT,
+    post_id INT,
+    type ENUM(
+		"like",
+        "comment"
+    ),
+    message TEXT,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (sender_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE,
+    
+    FOREIGN KEY (receiver_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE,
+    
+    FOREIGN KEY (post_id)
+    REFERENCES posts(id)
+    ON DELETE CASCADE
+);
+
+DROP PROCEDURE IF EXISTS CreateNotification;
+
+DELIMITER $$
+CREATE PROCEDURE CreateNotification(
+	IN p_sender_id INT,
+    IN p_receiver_id INT,
+    IN p_post_id INT,
+    IN p_type VARCHAR(20),
+    IN p_message TEXT
+)
+BEGIN
+	INSERT INTO notifications(
+		sender_id,
+        receiver_id,
+        post_id,
+        type,
+        message
+    )
+    VALUES (
+		p_sender_id,
+        p_receiver_id,
+        p_post_id,
+        p_type,
+        p_message
+    );
+END $$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS GetNotifications;
+
+DELIMITER $$
+CREATE PROCEDURE GetNotifications(
+	IN p_user_id INT
+)
+BEGIN
+	SELECT
+		n.*,
+        u.username,
+        u.profile_pic
+	FROM notifications n
+    JOIN users u
+    ON u.id = n.sender_id
+    WHERE n.receiver_id = p_user_id
+    ORDER BY n.created_at DESC;
+END $$
+DELIMITER ;
+
 
 
 

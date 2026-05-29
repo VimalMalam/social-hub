@@ -4,10 +4,12 @@ import { useAuth } from "../../context/AuthContext";
 import { useEffect, useState } from 'react';
 import API from "../../api/axios.js";
 import toast from "react-hot-toast";
+import NotificationDropdown from "../NotificationDropdown.jsx";
 
 const Navbar = () => {
 
     const [search, setSearch] = useState("");
+    const [openNotifications, setOpenNotifications] = useState(false);
     const [users, setUsers] = useState([]);
     const navigate = useNavigate();
 
@@ -125,14 +127,19 @@ const Navbar = () => {
 
 
                     {/* RIGHT */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex relative items-center gap-3">
 
                         {/* NOTIFICATION */}
-                        <button
+                        <button onClick={() => setOpenNotifications(!openNotifications)}
                             className="w-11 h-11 rounded-2xl bg-gray-100 hover:bg-gray-200 transition-all duration-300 flex items-center justify-center text-gray-700"
                         >
                             <Bell size={20} />
                         </button>
+                        {
+                            openNotifications && (
+                                <NotificationDropdown />
+                            )
+                        }
 
                         {/* MESSAGE */}
                         <Link to="/messages"

@@ -111,11 +111,11 @@ export const getMessages = (req, res) => {
 }
 
 // MARK AS READ
-export const markAsRead = async (req, res) => {
+export const markAsRead = (req, res) => {
     try {
         const {conversationId} = req.body;
 
-        await db.query(
+        db.query(
             "CALL MarkMessagesAsRead(?, ?)", [conversationId, req.user.id]
         );
 
