@@ -977,6 +977,90 @@ END$$
 
 DELIMITER ;
 
+CREATE TABLE saved_posts (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    post_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (user_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE,
+    
+    FOREIGN KEY (post_id)
+    REFERENCES posts(id)
+    ON DELETE CASCADE,
+    
+    UNIQUE KEY unique_save(
+		user_id,
+        post_id
+    )
+);
+
+DELIMITER $$
+
+CREATE PROCEDURE SavePost(
+	IN p_user_id INT,
+    IN p_post_id INT
+)
+BEGIN
+	INSERT IGNORE INTO saved_posts(
+		user_id,
+        post_id
+    ) VALUES (
+		p_user_id,
+        p_post_id
+    );
+END $$
+
+CREATE PROCEDURE UnsavePost(
+	IN p_user_id INT,
+    IN p_post_id INT
+)
+BEGIN
+	DELETE FROM saved_posts
+    WHERE user_id = p_user_id
+    AND post_id = p_post_id;
+END $$
+
+CREATE PROCEDURE CheckSavedPost(
+    IN p_user_id INT,
+    IN p_post_id INT
+)
+BEGIN
+
+    SELECT *
+    FROM saved_posts
+    WHERE user_id = p_user_id
+    AND post_id = p_post_id;
+
+END$$
+
+CREATE PROCEDURE GetSavedPosts(
+    IN p_user_id INT
+)
+BEGIN
+
+    SELECT
+        p.*,
+        u.username,
+        u.profile_pic
+    FROM saved_posts sp
+
+    JOIN posts p
+        ON sp.post_id = p.id
+
+    JOIN users u
+        ON p.user_id = u.id
+
+    WHERE sp.user_id = p_user_id
+
+    ORDER BY sp.created_at DESC;
+
+END$$
+
+DELIMITER ;
+
 
 
 

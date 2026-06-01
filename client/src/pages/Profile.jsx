@@ -15,6 +15,7 @@ const Profile = () => {
     const [profile, setProfile] = useState(null);
     const [posts, setPosts] = useState([]);
     const [showEdit, setShowEdit] = useState(false);
+    const [activeTab, setActiveTab] = useState("posts");
 
     const fetchProfile = async () => {
         try {
@@ -44,11 +45,6 @@ const Profile = () => {
         }
     };
 
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        fetchProfile();
-        fetchPosts();
-    }, [id]);
 
     const handleFollow = async () => {
         try {
@@ -74,20 +70,26 @@ const Profile = () => {
         }
     };
 
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchProfile();
+        fetchPosts();
+    }, [id]);
+
     if (!profile) return <p className="text-3xl font-bold text-center mt-10">Loading...</p>;
 
     return (
         <MainLayout>
 
-            <div className="bg-white border border-gray-200 rounded-[24px] sm:rounded-[28px] md:rounded-[36px] overflow-hidden shadow-[0_4px_30px_rgba(0,0,0,0.04)]">
+            <div className="bg-white border border-gray-200 rounded-3xl sm:rounded-[28px] md:rounded-[36px] overflow-hidden shadow-[0_4px_30px_rgba(0,0,0,0.04)]">
 
                 {/* PROFILE SECTION */}
-                <div className="p-4 sm:p-6 md:p-8 lg:p-10">
+                <div className="p-5 sm:p-7 md:p-10">
 
-                    <div className="flex flex-col xl:flex-row gap-8 xl:gap-12">
+                    <div className="flex flex-col xl:flex-row items-center xl:items-start gap-8 xl:gap-12">
 
                         {/* PROFILE IMAGE */}
-                        <div className="flex justify-center xl:justify-start shrink-0">
+                        <div className="shrink-0">
 
                             <img
                                 src={
@@ -95,21 +97,21 @@ const Profile = () => {
                                     "https://i.pravatar.cc/150"
                                 }
                                 alt=""
-                                className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 xl:w-40 xl:h-40 rounded-full object-cover ring-4 ring-gray-100 shadow-sm"
+                                className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-full object-cover ring-[6px] ring-gray-100 shadow-md"
                             />
 
                         </div>
 
 
                         {/* PROFILE INFO */}
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 w-full min-w-0">
 
-                            {/* USERNAME + BUTTONS */}
-                            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5 mb-8">
+                            {/* USERNAME + ACTIONS */}
+                            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
 
-                                <div className="text-center lg:text-left min-w-0">
+                                <div className="flex-1 min-w-0 text-center lg:text-left">
 
-                                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-words">
+                                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 wrap-break-words leading-tight">
 
                                         {profile.username}
 
@@ -119,14 +121,14 @@ const Profile = () => {
 
 
                                 {/* ACTION BUTTONS */}
-                                <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                                <div className="flex items-center justify-center lg:justify-end gap-3 shrink-0 flex-wrap">
 
                                     {
                                         Number(user.id) === Number(profile.id) ? (
 
                                             <button
                                                 onClick={() => setShowEdit(true)}
-                                                className="bg-gray-900 hover:bg-black text-white px-6 py-3 rounded-2xl font-medium transition-all duration-300 w-full sm:w-auto"
+                                                className="bg-gray-900 hover:bg-black text-white px-6 py-3 rounded-2xl font-medium transition-all duration-300"
                                             >
                                                 Edit Profile
                                             </button>
@@ -135,7 +137,7 @@ const Profile = () => {
 
                                             <button
                                                 onClick={handleFollow}
-                                                className="bg-gray-900 hover:bg-black text-white px-6 py-3 rounded-2xl font-medium transition-all duration-300 w-full sm:w-auto"
+                                                className="bg-gray-900 hover:bg-black text-white px-6 py-3 rounded-2xl font-medium transition-all duration-300"
                                             >
 
                                                 {
@@ -155,9 +157,9 @@ const Profile = () => {
 
                                             <button
                                                 onClick={handleStartChat}
-                                                className="bg-gray-100 hover:bg-gray-200 px-6 py-3 rounded-2xl font-medium transition-all duration-300 w-full sm:w-auto"
+                                                className="bg-gray-100 hover:bg-gray-200 p-3 rounded-2xl transition-all duration-300 flex items-center justify-center"
                                             >
-                                                <MessageCircle />
+                                                <MessageCircle size={20} />
                                             </button>
 
                                         )
@@ -169,47 +171,47 @@ const Profile = () => {
 
 
                             {/* STATS */}
-                            <div className="grid grid-cols-3 gap-3 sm:gap-4 md:gap-5 mb-8">
+                            <div className="grid grid-cols-3 gap-3 sm:gap-5 my-8">
 
-                                <div className="bg-gray-50 border border-gray-100 rounded-2xl sm:rounded-3xl p-3 sm:p-4 md:p-5 text-center">
+                                <div className="bg-linear-to-b from-gray-50 to-white border border-gray-100 rounded-3xl p-4 sm:p-5 text-center">
 
-                                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
+                                    <h3 className="text-2xl sm:text-3xl font-bold text-gray-900">
 
                                         {profile.postsCount}
 
                                     </h3>
 
-                                    <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">
+                                    <p className="text-sm text-gray-500 mt-1">
                                         Posts
                                     </p>
 
                                 </div>
 
 
-                                <div className="bg-gray-50 border border-gray-100 rounded-2xl sm:rounded-3xl p-3 sm:p-4 md:p-5 text-center">
+                                <div className="bg-linear-to-b from-gray-50 to-white border border-gray-100 rounded-3xl p-4 sm:p-5 text-center">
 
-                                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
+                                    <h3 className="text-2xl sm:text-3xl font-bold text-gray-900">
 
                                         {profile.followersCount}
 
                                     </h3>
 
-                                    <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">
+                                    <p className="text-sm text-gray-500 mt-1">
                                         Followers
                                     </p>
 
                                 </div>
 
 
-                                <div className="bg-gray-50 border border-gray-100 rounded-2xl sm:rounded-3xl p-3 sm:p-4 md:p-5 text-center">
+                                <div className="bg-linear-to-b from-gray-50 to-white border border-gray-100 rounded-3xl p-4 sm:p-5 text-center">
 
-                                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
+                                    <h3 className="text-2xl sm:text-3xl font-bold text-gray-900">
 
                                         {profile.followingCount}
 
                                     </h3>
 
-                                    <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">
+                                    <p className="text-sm text-gray-500 mt-1">
                                         Following
                                     </p>
 
@@ -219,9 +221,9 @@ const Profile = () => {
 
 
                             {/* BIO */}
-                            <div className="bg-gray-50 border border-gray-100 rounded-2xl sm:rounded-3xl p-4 sm:p-5">
+                            <div className="bg-gray-50 border border-gray-100 rounded-3xl p-5">
 
-                                <p className="text-sm sm:text-[15px] text-gray-700 leading-relaxed whitespace-pre-line break-words">
+                                <p className="text-[15px] text-gray-700 leading-7 whitespace-pre-line wrap-break-words">
 
                                     {profile.bio || "No bio"}
 
@@ -237,22 +239,35 @@ const Profile = () => {
 
 
                 {/* POSTS SECTION */}
-                <div className="border-t border-gray-100 p-4 sm:p-6 md:p-8">
+                <div className="border-t border-gray-100 p-5 sm:p-7 md:p-8">
 
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                    <div className="flex items-center justify-between mb-6">
+
+                        <h3 className="text-xl font-bold text-gray-900">
+                            Posts
+                        </h3>
+
+                        <span className="text-sm text-gray-500">
+                            {posts.length} Posts
+                        </span>
+
+                    </div>
+
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 
                         {
                             posts.map((post) => (
 
                                 <div
                                     key={post.id}
-                                    className="group overflow-hidden rounded-[18px] sm:rounded-[24px] border border-gray-100 bg-gray-50"
+                                    className="group overflow-hidden rounded-[26px] border border-gray-100 bg-gray-50 shadow-sm hover:shadow-md transition-all duration-300"
                                 >
 
                                     <img
                                         src={post.image}
                                         alt=""
-                                        className="w-full h-44 sm:h-64 md:h-72 lg:h-80 object-cover group-hover:scale-[1.04] transition-all duration-500"
+                                        className="w-full h-48 sm:h-72 md:h-80 object-cover group-hover:scale-105 transition-all duration-700"
                                     />
 
                                 </div>

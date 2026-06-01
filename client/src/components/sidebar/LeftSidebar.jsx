@@ -70,6 +70,18 @@ const LeftSidebar = () => {
                         </span>
                     </button>
 
+                    <Link
+                        to="/saved"
+                        className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-gray-700 hover:bg-gray-100 hover:text-black cursor-pointer transition-all duration-300 group"
+                    >
+                        <div className="text-gray-500 group-hover:text-black transition">
+                            <Bookmark size={20} />
+                        </div>
+                        <span className="font-medium text-[15px]">
+                            Saved
+                        </span>
+                    </Link>
+
                 </div>
 
             </div>

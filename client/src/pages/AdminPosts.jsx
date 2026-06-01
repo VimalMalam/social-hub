@@ -26,7 +26,7 @@ const AdminPosts = () => {
 
             if (!confirmDelete) return;
 
-            const res = await API.delete(`/admin/posts${id}`);
+            const res = await API.delete(`/admin/posts/${id}`);
 
             toast.success(res.data.message);
 

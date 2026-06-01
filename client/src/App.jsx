@@ -20,6 +20,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminPosts from "./pages/AdminPosts";
 import Messages from "./pages/Messages";
+import SavedPosts from "./pages/SavedPosts";
 
 function App() {
 
@@ -53,6 +54,15 @@ function App() {
         element={
           <ProtectedRoute>
             <Messages />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/saved"
+        element={
+          <ProtectedRoute>
+            <SavedPosts />
           </ProtectedRoute>
         }
       />

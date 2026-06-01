@@ -1,5 +1,5 @@
-import { Heart, MessageCircle, Send, Info } from "lucide-react";
-import { useState } from "react";
+import { Heart, MessageCircle, Send, Info, Bookmark } from "lucide-react";
+import { useState, useEffect } from "react";
 import 'react'
 import API from "../../api/axios.js";
 import CommentModal from "./CommentModal.jsx";
@@ -10,6 +10,7 @@ const PostCard = ({ post, fetchPosts }) => {
 
     const [showComments, setShowComments] = useState(false);
     const [liked, setLiked] = useState(post.isLiked);
+    const [saved, setSaved] = useState(false);
 
     const handleLike = async () => {
         try {
@@ -25,7 +26,7 @@ const PostCard = ({ post, fetchPosts }) => {
         } catch (error) {
             console.log(error);
         }
-    }
+    };
 
     const handleReport = async () => {
         try {
@@ -36,14 +37,40 @@ const PostCard = ({ post, fetchPosts }) => {
             if (!reason) return;
 
             const res = await API.post(
-                `/posts/report/${post.id}`, {reason}
+                `/posts/report/${post.id}`, { reason }
             );
 
             toast.success(res.data.message);
         } catch (error) {
             console.log(error);
         }
-    }
+    };
+
+    const handleSave = async () => {
+        try {
+            if (saved) {
+                await API.post("/saved-posts/unsave", { postId: post.id });
+                setSaved(false);
+            } else {
+                await API.post("/saved-posts/save", { postId: post.id });
+                setSaved(true);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        const checkSaved = async () => {
+            try {
+                const res = await API.get(`/saved-posts/check/${post.id}`);
+                setSaved(res.data.saved);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        checkSaved();
+    }, [post.id]);
 
     return (
         <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-[0_4px_30px_rgba(0,0,0,0.04)]">
@@ -81,7 +108,7 @@ const PostCard = ({ post, fetchPosts }) => {
                     className="text-red-500 font-semibold cursor-pointer"
                 >
 
-                    <Info size={22}/>
+                    <Info size={22} />
 
                 </button>
 
@@ -113,6 +140,10 @@ const PostCard = ({ post, fetchPosts }) => {
 
                     <button className="text-gray-700 hover:text-green-500 transition-all duration-300">
                         <Send className="cursor-pointer" size={22} />
+                    </button>
+
+                    <button className="text-gray-700 hover:text-yellow-500 transition-all duration-300 ml-auto" onClick={handleSave}>
+                        <Bookmark className={`cursor-pointer ${saved ? "fill-yellow-500 text-yellow-500" : ""}`} size={22} />
                     </button>
 
                 </div>
