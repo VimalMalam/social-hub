@@ -113,6 +113,16 @@ io.on("connection", (socket) => {
             );
         }
     });
+
+    socket.on("readMessages", (data) => {
+        const receiver = onlineUsers.find(
+            (user) => user.userId === data.receiverId
+        );
+
+        if (receiver) {
+            io.to(receiver.socketId).emit("messagesRead", data);
+        }
+    });
 });
 
 app.use(express.json());

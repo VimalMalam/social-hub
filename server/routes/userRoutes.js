@@ -1,5 +1,5 @@
 import express from "express";
-import { getProfile, getUserPosts, followUser, unfollowUser, updateProfile, getCurrentUser, getSuggestedUsers, searchUsers } from "../controllers/userController.js";
+import { getProfile, getUserPosts, followUser, unfollowUser, updateProfile, getCurrentUser, getSuggestedUsers, searchUsers, checkFollowStatus, getFollowStats } from "../controllers/userController.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
 import upload from "../middleware/uploadMiddleware.js";
 
@@ -28,5 +28,9 @@ router.get("/suggested", verifyToken, getSuggestedUsers);
 
 // SEARCH USERS
 router.get("/search", verifyToken, searchUsers);
+
+router.get("/follow/check/:id", verifyToken, checkFollowStatus);
+
+router.get("/follow/stats/:id", verifyToken, getFollowStats);
 
 export default router;

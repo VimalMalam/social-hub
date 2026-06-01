@@ -192,6 +192,7 @@ ALTER TABLE users
 ADD COLUMN bio TEXT,
 ADD COLUMN profile_pic TEXT;
 
+DROP PROCEDURE IF EXISTS FollowUser;
 DELIMITER $$
 
 CREATE PROCEDURE FollowUser(
@@ -211,6 +212,7 @@ END $$
 
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS UnfollowUser;
 DELIMITER $$
 
 CREATE PROCEDURE UnfollowUser(
@@ -225,6 +227,7 @@ END $$
 
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS UnfollowUser;
 DELIMITER $$
 
 CREATE PROCEDURE GetUserProfile(
@@ -801,7 +804,9 @@ BEGIN
 END $$
 DELIMITER ;
 
-CREATE TABLE notification (
+DROP TABLE notification;
+
+CREATE TABLE notifications (
 	id INT PRIMARY KEY AUTO_INCREMENT,
     sender_id INT,
     receiver_id INT,
@@ -859,14 +864,14 @@ DROP PROCEDURE IF EXISTS GetNotifications;
 
 DELIMITER $$
 CREATE PROCEDURE GetNotifications(
-	IN p_user_id INT
+    IN p_user_id INT
 )
 BEGIN
-	SELECT
-		n.*,
+    SELECT
+        n.*,
         u.username,
         u.profile_pic
-	FROM notifications n
+    FROM notifications n
     JOIN users u
     ON u.id = n.sender_id
     WHERE n.receiver_id = p_user_id
@@ -874,6 +879,103 @@ BEGIN
 END $$
 DELIMITER ;
 
+SELECT * FROM notifications;
+SHOW PROCEDURE STATUS
+WHERE Db = DATABASE();
+
+DESCRIBE followers;
+
+DROP PROCEDURE FollowUser;
+
+DELIMITER $$
+
+CREATE PROCEDURE FollowUser(
+    IN p_follower_id INT,
+    IN p_following_id INT
+)
+BEGIN
+    INSERT IGNORE INTO followers(
+        follower_id,
+        following_id
+    )
+    VALUES(
+        p_follower_id,
+        p_following_id
+    );
+END$$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS UnfollowUser;
+
+DELIMITER $$
+
+CREATE PROCEDURE UnfollowUser(
+    IN p_follower_id INT,
+    IN p_following_id INT
+)
+BEGIN
+
+    DELETE FROM followers
+    WHERE follower_id = p_follower_id
+    AND following_id = p_following_id;
+
+END$$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS CheckFollow;
+
+DELIMITER $$
+
+CREATE PROCEDURE CheckFollow(
+    IN p_follower_id INT,
+    IN p_following_id INT
+)
+BEGIN
+
+    SELECT *
+    FROM followers
+    WHERE follower_id = p_follower_id
+    AND following_id = p_following_id;
+
+END$$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS GetFollowersCount;
+
+DELIMITER $$
+
+CREATE PROCEDURE GetFollowersCount(
+    IN p_user_id INT
+)
+BEGIN
+
+    SELECT COUNT(*) AS followers
+    FROM followers
+    WHERE following_id = p_user_id;
+
+END$$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS GetFollowingCount;
+
+DELIMITER $$
+
+CREATE PROCEDURE GetFollowingCount(
+    IN p_user_id INT
+)
+BEGIN
+
+    SELECT COUNT(*) AS following
+    FROM followers
+    WHERE follower_id = p_user_id;
+
+END$$
+
+DELIMITER ;
 
 
 

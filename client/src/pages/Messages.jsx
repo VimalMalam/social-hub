@@ -66,6 +66,11 @@ const Messages = () => {
 
         if (currentChat) {
             markRead();
+            socket.emit("readMessages", {
+                conversationId: currentChat.id,
+                senderId: user.id,
+                receiverId: currentChat.userId
+            });
             fetchMessages();
         }
 
@@ -89,12 +94,33 @@ const Messages = () => {
             await API.post("/chat/message", { conversationId: currentChat.id, message: text });
 
             // LOCAL UI UPDATE
-            setMessages((prev) => [...prev, { id: Date.now() + Math.random(), sender_id: user.id, message: text }]);
+            setMessages((prev) => [
+                ...prev,
+                {
+                    id: Date.now() + Math.random(),
+                    sender_id: user.id,
+                    message: text,
+                    is_read: 0,
+                    created_at: new Date().toISOString()
+                }
+            ]);
             setText("");
         } catch (error) {
             console.log(error);
         }
     };
+
+    useEffect(() => {
+        const handleMessagesRead = (data) => {
+            setMessages((prev) =>
+                prev.map((msg) =>
+                    msg.sender_id === user.id ? { ...msg, is_read: 1 } : msg));
+        };
+        socket.on("messagesRead", handleMessagesRead);
+        return () => {
+            socket.off("messagesRead", handleMessagesRead);
+        };
+    }, [user.id]);
 
     useEffect(() => {
         const receiverMessage = (data) => {
@@ -316,31 +342,42 @@ const Messages = () => {
 
                                                     <p>{message.message}</p>
 
-                                                    <p className="text-[11px] mt-1 opacity-70">
-                                                        {
-                                                            new Date(
-                                                                message.created_at ||
-                                                                Date.now()
-                                                            ).toLocaleTimeString(
-                                                                [],
-                                                                {
-                                                                    hour: "2-digit",
-                                                                    minute: "2-digit"
-                                                                }
-                                                            )
-                                                        }
+                                                    <div className="flex items-center justify-end gap-2 mt-1">
+
+                                                        <span className="text-[11px] opacity-70">
+
+                                                            {
+                                                                new Date(
+                                                                    message.created_at ||
+                                                                    Date.now()
+                                                                ).toLocaleTimeString(
+                                                                    [],
+                                                                    {
+                                                                        hour: "2-digit",
+                                                                        minute: "2-digit"
+                                                                    }
+                                                                )
+                                                            }
+
+                                                        </span>
+
                                                         {
                                                             message.sender_id === user.id && (
-                                                                <p className="text-[10px] opacity-70 mt-1 text-right">
+
+                                                                <span className="text-[10px] opacity-70">
+
                                                                     {
                                                                         message.is_read
                                                                             ? "Seen"
                                                                             : "Sent"
                                                                     }
-                                                                </p>
+
+                                                                </span>
+
                                                             )
                                                         }
-                                                    </p>
+
+                                                    </div>
 
                                                 </div>
 

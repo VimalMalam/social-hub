@@ -128,16 +128,79 @@ export const updateProfile = (req, res) => {
     }
 };
 
+// CHECK FOLLOWER STATUS
+export const checkFollowStatus = (req, res) => {
+    try {
+        const followerId = req.user.id;
+        const followingId = req.params.id;
+        db.query(
+            "CALL CheckFollow(?, ?)",
+            [followerId, followingId],
+            (err, result) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({
+                        message: err.message
+                    });
+                }
+                res.status(200).json({
+                    following: result[0].length > 0
+                });
+            }
+        );
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json(error);
+    }
+};
+
+// FOLLOW STATS
+export const getFollowStats = (req, res) => {
+    try {
+        const userId = req.params.id;
+        db.query(
+            "CALL GetFollowersCount(?)",
+            [userId],
+            (err, followersResult) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({
+                        message: err.message
+                    });
+                }
+                db.query(
+                    "CALL GetFollowingCount(?)",
+                    [userId],
+                    (err, followingResult) => {
+                        if (err) {
+                            console.log(err);
+                            return res.status(500).json({
+                                message: err.message
+                            });
+                        }
+                        res.status(200).json({
+                            followers:
+                                followersResult[0][0].followers,
+                            following:
+                                followingResult[0][0].following
+                        });
+                    }
+                );
+            }
+        );
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json(error);
+    }
+};
+
 // GET CURRENT USER
 export const getCurrentUser = (req, res) => {
-
     try {
-
         const userId = req.user.id;
-
-
         db.query(
-
             `
             SELECT
                 id,
@@ -146,82 +209,50 @@ export const getCurrentUser = (req, res) => {
                 profile_pic,
                 bio,
                 role
-
             FROM users
-
             WHERE id = ?
             `,
-
             [userId],
-
             (err, result) => {
-
                 if (err) {
-
                     console.log(err);
-
                     return res.status(500).json({
                         message: err.message
                     });
-
                 }
-
-
                 res.status(200).json(
                     result[0][0]
                 );
-
             }
-
         );
-
     }
     catch (error) {
         console.log(error);
-
         res.status(500).json(error);
-
     }
-
 };
 
 // GET RANDOM USERS
 export const getSuggestedUsers = (req, res) => {
 
     try {
-
         const loggedInUser = req.user.id;
-
-
         db.query(
             "CALL GetSuggestedUsers(?)", [loggedInUser], (err, result) => {
-
                 if (err) {
-
                     console.log(err);
-
                     return res.status(500).json({
                         message: err.message
                     });
-
                 }
-
-
                 res.status(200).json(result[0]);
-
             }
-
         );
-
     }
     catch (error) {
-
         console.log(error);
-
         res.status(500).json(error);
-
     }
-
 };
 
 // SEARCH USERS
