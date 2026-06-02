@@ -225,6 +225,9 @@ export const sendOTP = async (req, res) => {
             delete otpStore[email];
         }, 5 * 60 * 1000);
 
+        console.log("EMAIL_USER:", process.env.EMAIL_USER);
+        console.log("EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
+
         // SEND EMAIL
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
@@ -268,7 +271,11 @@ export const sendOTP = async (req, res) => {
             message: "OTP sent to email"
         });
     } catch (error) {
-        res.status(500).json(error);
+        console.log("SEND OTP ERROR:", error);
+
+        res.status(500).json({
+            message: error.message
+        });
     }
 };
 
