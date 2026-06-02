@@ -15,7 +15,6 @@ const Profile = () => {
     const [profile, setProfile] = useState(null);
     const [posts, setPosts] = useState([]);
     const [showEdit, setShowEdit] = useState(false);
-    const [activeTab, setActiveTab] = useState("posts");
 
     const fetchProfile = async () => {
         try {
