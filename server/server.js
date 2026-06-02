@@ -22,7 +22,7 @@ const app = express();
 
 app.use(cors({
     origin: [
-        "https://social-hub-client.up.railway.app"
+        "http://localhost:5173"
     ],
     credentials: true
 }));
@@ -33,9 +33,8 @@ const server = http.createServer(app);
 // SOCKET SERVER
 export const io = new Server(server, {
     cors: {
-        origin: [
-            "https://social-hub-client.up.railway.app"
-        ],
+        origin: "http://localhost:5173",
+        methods: ["GET", "POST"],
         credentials: true
     }
 });
