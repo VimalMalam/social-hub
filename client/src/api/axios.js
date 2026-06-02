@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const API = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
+    baseURL: "https://social-hub-server.up.railway.app/api",
     withCredentials: true
 });
 
