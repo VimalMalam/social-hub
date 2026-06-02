@@ -22,7 +22,7 @@ const app = express();
 
 app.use(cors({
     origin: [
-        "https://social-hub-server.up.railway.app"
+        "https://social-hub-client.up.railway.app"
     ],
     credentials: true
 }));
@@ -34,7 +34,7 @@ const server = http.createServer(app);
 export const io = new Server(server, {
     cors: {
         origin: [
-            "https://social-hub-server.up.railway.app"
+            "https://social-hub-client.up.railway.app"
         ],
         credentials: true
     }
@@ -164,8 +164,6 @@ app.get("/protected", verifyToken, (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-server.listen(5000, () => {
-    console.log(
-        "Server running on port 5000"
-    );
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
