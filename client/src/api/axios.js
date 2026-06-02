@@ -1,7 +1,4 @@
 import axios from "axios";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const API = axios.create({
     baseURL: "https://social-hub-server.up.railway.app/api",
