@@ -4,6 +4,9 @@ import bcrypt from "bcryptjs";
 
 import { transporter } from "../config/mailer.js";
 import { otpStore } from "../utils/otpStore.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // Generate JWT token
 export const generateToken = (user) => {
