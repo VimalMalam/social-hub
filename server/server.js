@@ -22,7 +22,7 @@ const app = express();
 
 app.use(cors({
     origin: [
-        "https://social-hub-client.up.railway.app"
+        "https://social-hub-server.up.railway.app"
     ],
     credentials: true
 }));
@@ -34,7 +34,7 @@ const server = http.createServer(app);
 export const io = new Server(server, {
     cors: {
         origin: [
-            "https://social-hub-client.up.railway.app"
+            "https://social-hub-server.up.railway.app"
         ],
         credentials: true
     }
